@@ -40,7 +40,7 @@ const SearchInput = function SearchInput({
   const handleSelectedValue = (newValue: Product | null) => {
     if (newValue) {
       if (searchType === searchProductsType) {
-        searchStore.setSelectedProduct(newValue);
+        searchStore.setSelectedProduct();
       }
     }
   };
@@ -53,7 +53,7 @@ const SearchInput = function SearchInput({
 
   return (
     <Autocomplete
-      sx={{ width: 700 }}
+      sx={{ maxWidth: 500 }}
       onInputChange={debounce((e) => searchByInputValue(e.target?.value), 1000)} // add delay to user typing
       filterOptions={(x) => x}
       isOptionEqualToValue={(fetchResults, value) =>

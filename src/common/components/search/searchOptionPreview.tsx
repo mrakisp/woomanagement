@@ -26,8 +26,8 @@ const SearchOptionPreview = function SearchOptionPreview({
           <img
             loading="lazy"
             width="50"
-            src={option.image}
-            srcSet={option.image}
+            src={option.images[0].src ? option.images[0].src : null}
+            srcSet={option.images[0].src ? option.images[0].src : null}
             alt={option.name}
           />
           {searchBy}: {option.sku} - Name: {option.name}

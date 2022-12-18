@@ -1,11 +1,19 @@
-import React, { useState } from "react";
-import UpdateProducts from "../../views/updateProducts/updateProducts";
+import React from "react";
+import UpdateProductView from "../../views/updateProductView";
+import CreateProductView from "../../views/createProductView";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 
 interface TabPanelProps {
   children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  dir?: string;
   index: number;
   value: number;
 }
@@ -17,71 +25,42 @@ function TabPanel(props: TabPanelProps) {
     <div
       role="tabpanel"
       hidden={value !== index}
-      id={`vertical-tabpanel-${index}`}
-      aria-labelledby={`vertical-tab-${index}`}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
       {...other}
     >
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
-
-function a11yProps(index: number) {
-  return {
-    id: `vertical-tab-${index}`,
-    "aria-controls": `vertical-tabpanel-${index}`,
-  };
-}
-
-export default function VerticalTabs() {
-  const [value, setValue] = useState(0);
+export default function CenteredTabs() {
+  const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
   return (
-    <Box
-      sx={{
-        flexGrow: 1,
-        bgcolor: "background.paper",
-        display: "flex",
-        // height: 600,
-      }}
-    >
+    <Box sx={{ width: "100%" }}>
       <Tabs
-        orientation="vertical"
-        variant="scrollable"
         value={value}
         onChange={handleChange}
-        aria-label="Vertical tabs"
-        sx={{ borderRight: 1, borderColor: "divider" }}
+        variant="scrollable"
+        scrollButtons="auto"
+        sx={{ bgcolor: "#d8e3ed" }}
       >
-        <Tab label="Update Product" {...a11yProps(0)} />
-        <Tab label="Item Two" {...a11yProps(1)} />
-        <Tab label="Item Three" {...a11yProps(2)} />
-        <Tab label="Item Four" {...a11yProps(3)} />
-        <Tab label="Item Five" {...a11yProps(4)} />
-        <Tab label="Item Six" {...a11yProps(5)} />
-        <Tab label="Item Seven" {...a11yProps(6)} />
+        <Tab label="Update Product" />
+        <Tab label="Create Product" />
+        <Tab label="Item Three" />
       </Tabs>
       <TabPanel value={value} index={0}>
-        <UpdateProducts />
+        <UpdateProductView />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        Item Two
+        <CreateProductView />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        Item Three 1
-      </TabPanel>
-      <TabPanel value={value} index={3}>
-        Item Four
-      </TabPanel>
-      <TabPanel value={value} index={4}>
-        Item Five
-      </TabPanel>
-      <TabPanel value={value} index={5}>
-        Item Six
+        Item Three
       </TabPanel>
     </Box>
   );

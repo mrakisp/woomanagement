@@ -1,11 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import axios from "axios";
 import { productsEndPoint } from "../config/config";
-
-interface SelectedProduct {
-  name: string | undefined | null;
-  id: number | undefined | null;
-}
+import ProductStore from "./productStore";
 
 class searchStore {
   products: any = [];
@@ -35,25 +31,13 @@ class searchStore {
   }
 
   setSearchProductResults(results: any) {
-    results.forEach((product: any) => {
-      this.products.push({
-        name: product.name,
-        id: product.id,
-        sku: product.sku,
-        image:
-          product.images[0] && product.images[0].src
-            ? product.images[0].src
-            : null,
-      });
-    });
+    this.products = results;
     this.resetLoading();
   }
 
-  setSelectedProduct(selectedValue: SelectedProduct) {
-    this.selectedProduct = {
-      name: selectedValue.name,
-      id: selectedValue.id,
-    };
+  setSelectedProduct() {
+    this.selectedProduct = this.products[0];
+    ProductStore.updateProduct(this.products[0]);
   }
 
   /* END PRODUCTS */
@@ -61,7 +45,13 @@ class searchStore {
   resetLoading() {
     this.loading = false;
   }
+
+  resetAll() {
+    this.loading = false;
+    this.products = [];
+    this.selectedProduct = {};
+  }
 }
 
-const store = new searchStore();
-export default store;
+const Searchstore = new searchStore();
+export default Searchstore;

@@ -1,3 +1,3 @@
 export * as loginStore from "./loginStore";
-export * as productsStore from "./productsStore";
-export * as searchProductsStore from "./searchStore";
+export * as productsStore from "./productStore";
+export * as searchStore from "./searchStore";
