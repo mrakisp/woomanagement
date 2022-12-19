@@ -12,13 +12,17 @@ class productStore {
 
   createProduct(data: any) {
     this.loading = true;
-    axios
-      .post(productsEndPoint, {
-        data: data,
-      })
-      .then((res) => {
-        console.log("posted");
-      });
+    axios({
+      method: "post",
+      url: productsEndPoint,
+      data: data,
+      // headers: {
+      //   Authorization: `Basic ${process.env.TOKEN}`,
+      // },
+    }).then((response) => {
+      console.log("posted", response);
+      this.loading = false;
+    });
   }
 
   updateProduct(data: any) {

@@ -7,7 +7,10 @@ import {
   searchProductsType,
   searchBySku,
 } from "../common/components/search/searchTypes";
-import { StyledLabel } from "../common/components/label";
+import {
+  StyledLabel,
+  ActionButton,
+} from "../common/components/styledComponents";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextareaAutosize from "@mui/base/TextareaAutosize";
@@ -138,8 +141,14 @@ const UpdateProduct = function UpdateProduct() {
               }}
               type="number"
             />
+            <StyledLabel>Image</StyledLabel>
+            <img
+              width="250"
+              alt={productStore.productToBeUpdated.name}
+              src={productStore.productToBeUpdated.images[0].src}
+            />
           </Grid>
-          <button onClick={handleSave}>Update</button>
+          <ActionButton onClick={handleSave}>Update</ActionButton>
         </>
       ) : null}
     </Grid>

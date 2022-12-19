@@ -13,17 +13,22 @@ class searchStore {
   }
 
   /* PRODUCTS */
-  async getProducts(searchBy?: string | null | undefined, value?: any) {
+  async getProducts(searchBy: string | null | undefined, value: any) {
     this.products = [];
     this.loading = true;
 
-    const finalEndPoint = searchBy
-      ? productsEndPoint + searchBy + "=" + value
-      : productsEndPoint;
-
-    axios.get(finalEndPoint).then((res) => {
-      if (res && res.data && res.data.length > 0) {
-        this.setSearchProductResults(res.data);
+    axios({
+      method: "get",
+      url: productsEndPoint,
+      params: {
+        searchBy: value,
+      },
+      // headers: {
+      //   Authorization: `Basic ${process.env.TOKEN}`,
+      // },
+    }).then((response) => {
+      if (response && response.data && response.data.length > 0) {
+        this.setSearchProductResults(response.data);
       } else {
         this.resetLoading();
       }

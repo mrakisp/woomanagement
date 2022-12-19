@@ -4,7 +4,7 @@ import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextareaAutosize from "@mui/base/TextareaAutosize";
 import Grid from "@mui/material/Grid";
-import { StyledLabel } from "../common/components/label";
+import { StyledLabel } from "../common/components/styledComponents";
 
 const CreateProduct = function CreateProduct() {
   const handleSave = () => {};

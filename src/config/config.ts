@@ -1,12 +1,12 @@
 export const logInCredentials = {
-  email: "akis",
-  password: "123",
+  email: process.env.REACT_APP_USERNAME,
+  password: process.env.REACT_APP_PASSWORD,
 };
 
-const rest_api_creds = {
-  website: "https://test.solidcube.gr", // WEBSITE URL
-  consumer_key: "ck_c48e3451655ea97691d58a7f1aa62c1826b4596d", // CONSUMER KEY
-  consumer_secret: "cs_6a8a533069477d0f3968f83343e8d3cd74e809dc", // CONSUMER SECRET
+export const rest_api_creds = {
+  website: process.env.REACT_APP_WEBSITE, // WEBSITE URL
+  consumer_key: process.env.REACT_APP_CONSUMER_KEY, // CONSUMER KEY
+  consumer_secret: process.env.REACT_APP_CONSUMER_SECRET, // CONSUMER SECRET
 };
 
 const token =
@@ -14,5 +14,6 @@ const token =
   rest_api_creds.consumer_key +
   "&consumer_secret=" +
   rest_api_creds.consumer_secret;
+
 export const productsEndPoint =
-  rest_api_creds.website + "/wp-json/wc/v3/products?" + token + "&";
+  rest_api_creds.website + "/wp-json/wc/v3/products?" + token;
