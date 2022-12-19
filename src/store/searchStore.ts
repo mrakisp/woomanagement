@@ -1,6 +1,6 @@
 import { makeAutoObservable } from "mobx";
 import axios from "axios";
-import { productsEndPoint } from "../config/config";
+import { productsEndPoint, token } from "../config/config";
 import ProductStore from "./productStore";
 
 class searchStore {
@@ -19,13 +19,10 @@ class searchStore {
 
     axios({
       method: "get",
-      url: productsEndPoint,
+      url: productsEndPoint + "?" + token,
       params: {
         searchBy: value,
       },
-      // headers: {
-      //   Authorization: `Basic ${process.env.TOKEN}`,
-      // },
     }).then((response) => {
       if (response && response.data && response.data.length > 0) {
         this.setSearchProductResults(response.data);
@@ -42,7 +39,7 @@ class searchStore {
 
   setSelectedProduct() {
     this.selectedProduct = this.products[0];
-    ProductStore.updateProduct(this.products[0]);
+    ProductStore.setSelectedUpdateProduct(this.products[0]);
   }
 
   /* END PRODUCTS */

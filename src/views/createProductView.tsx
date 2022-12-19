@@ -5,9 +5,20 @@ import InputAdornment from "@mui/material/InputAdornment";
 import TextareaAutosize from "@mui/base/TextareaAutosize";
 import Grid from "@mui/material/Grid";
 import { StyledLabel } from "../common/components/styledComponents";
+import FixedBottom from "../common/components/fixedBottomContainer";
+import Button from "../common/components/button";
 
 const CreateProduct = function CreateProduct() {
   const handleSave = () => {};
+
+  const FixedButton = () => (
+    <Button
+      // isLoading={productStore.loading}
+      onClick={handleSave}
+      // disabled={!productStore.isProductChanged}
+      text="Save"
+    />
+  );
 
   return (
     <Grid
@@ -69,7 +80,7 @@ const CreateProduct = function CreateProduct() {
           type="number"
         />
       </Grid>
-      <button onClick={handleSave}>Save</button>
+      <FixedBottom button={<FixedButton />} />
     </Grid>
   );
 };

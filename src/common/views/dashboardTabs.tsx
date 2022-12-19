@@ -49,18 +49,18 @@ export default function CenteredTabs() {
         scrollButtons="auto"
         sx={{ bgcolor: "#d8e3ed" }}
       >
-        <Tab label="Update Product" />
+        <Tab label="Dashboard" />
         <Tab label="Create Product" />
-        <Tab label="Item Three" />
+        <Tab label="Update Product" />
       </Tabs>
       <TabPanel value={value} index={0}>
-        <UpdateProductView />
+        dashboard
       </TabPanel>
       <TabPanel value={value} index={1}>
         <CreateProductView />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        Item Three
+        <UpdateProductView />
       </TabPanel>
     </Box>
   );

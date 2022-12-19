@@ -7,23 +7,36 @@ import {
   searchProductsType,
   searchBySku,
 } from "../common/components/search/searchTypes";
-import {
-  StyledLabel,
-  ActionButton,
-} from "../common/components/styledComponents";
+import { StyledLabel } from "../common/components/styledComponents";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextareaAutosize from "@mui/base/TextareaAutosize";
 import Grid from "@mui/material/Grid";
+import Button from "../common/components/button";
+import FixedBottom from "../common/components/fixedBottomContainer";
 
 const UpdateProduct = function UpdateProduct() {
   const handleSave = () => {
-    // console.log(productStore.productToBeUpdated);
-    // productStore.createProduct(productStore.productToBeUpdated);
+    if (productStore.isProductChanged) {
+      productStore.updateProduct();
+    }
   };
   // useEffect(() => {
   //   searchStore.resetAll();
   // }, []);
+
+  const handleInputChange = (propertyToBeUpdated: string, value: any) => {
+    productStore.updateValueOfProduct(propertyToBeUpdated, value);
+  };
+
+  const FixedButton = () => (
+    <Button
+      isLoading={productStore.loading}
+      onClick={handleSave}
+      disabled={!productStore.isProductChanged}
+      text="Save"
+    />
+  );
 
   return (
     <Grid
@@ -80,6 +93,7 @@ const UpdateProduct = function UpdateProduct() {
               fullWidth
               id="filled-hidden-label-small"
               defaultValue={productStore.productToBeUpdated.name}
+              onChange={(e) => handleInputChange("name", e.target.value)}
               size="small"
             />
 
@@ -88,6 +102,7 @@ const UpdateProduct = function UpdateProduct() {
               aria-label="minimum height"
               minRows={10}
               defaultValue={productStore.productToBeUpdated.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
               style={{ width: "100%" }}
             />
 
@@ -96,6 +111,9 @@ const UpdateProduct = function UpdateProduct() {
               aria-label="minimum height"
               minRows={5}
               defaultValue={productStore.productToBeUpdated.short_description}
+              onChange={(e) =>
+                handleInputChange("short_description", e.target.value)
+              }
               style={{ width: "100%" }}
             />
           </Grid>
@@ -105,13 +123,16 @@ const UpdateProduct = function UpdateProduct() {
             <TextField
               id="filled-hidden-label-small"
               defaultValue={productStore.productToBeUpdated.sku}
+              onChange={(e) => handleInputChange("sku", e.target.value)}
               size="small"
             />
-
             <StyledLabel>Price</StyledLabel>
             <TextField
               id="filled-hidden-label-small"
               defaultValue={productStore.productToBeUpdated.regular_price}
+              onChange={(e) =>
+                handleInputChange("regular_price", e.target.value)
+              }
               size="small"
               InputProps={{
                 inputProps: { min: 0 },
@@ -119,11 +140,11 @@ const UpdateProduct = function UpdateProduct() {
               }}
               type="number"
             />
-
             <StyledLabel>Sale Price</StyledLabel>
             <TextField
               id="filled-hidden-label-small"
               defaultValue={productStore.productToBeUpdated.sale_price}
+              onChange={(e) => handleInputChange("sale_price", e.target.value)}
               size="small"
               InputProps={{
                 inputProps: { min: 0 },
@@ -135,6 +156,9 @@ const UpdateProduct = function UpdateProduct() {
             <TextField
               id="filled-hidden-label-small"
               defaultValue={productStore.productToBeUpdated.stock_quantity}
+              onChange={(e) =>
+                handleInputChange("stock_quantity", parseInt(e.target.value))
+              }
               size="small"
               InputProps={{
                 inputProps: { min: 0 },
@@ -148,7 +172,7 @@ const UpdateProduct = function UpdateProduct() {
               src={productStore.productToBeUpdated.images[0].src}
             />
           </Grid>
-          <ActionButton onClick={handleSave}>Update</ActionButton>
+          <FixedBottom button={<FixedButton />} />
         </>
       ) : null}
     </Grid>
