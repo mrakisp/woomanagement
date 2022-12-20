@@ -33,7 +33,7 @@ export default function Button({
       // color="secondary"
       onClick={onClick}
       loading={isLoading}
-      loadingPosition="end"
+      // loadingPosition="end"
       endIcon={icon}
       variant={variant}
       disabled={disabled}
