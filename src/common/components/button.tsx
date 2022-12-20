@@ -30,7 +30,6 @@ export default function Button({
 }: ButtonProps) {
   return (
     <LoadingButton
-      // color="secondary"
       onClick={onClick}
       loading={isLoading}
       // loadingPosition="end"
