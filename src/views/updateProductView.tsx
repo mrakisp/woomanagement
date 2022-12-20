@@ -1,5 +1,6 @@
 import React from "react";
 import productStore from "../store/productStore";
+import ProductCategories from "../common/components/productCategories";
 import SearchInput from "../common/components/search/searchInput";
 import { observer } from "mobx-react-lite";
 import { isEmpty } from "lodash";
@@ -21,22 +22,15 @@ const UpdateProduct = function UpdateProduct() {
       productStore.updateProduct();
     }
   };
-  // useEffect(() => {
-  //   searchStore.resetAll();
-  // }, []);
 
   const handleInputChange = (propertyToBeUpdated: string, value: any) => {
     productStore.updateValueOfProduct(propertyToBeUpdated, value);
   };
 
-  const FixedButton = () => (
-    <Button
-      isLoading={productStore.loading}
-      onClick={handleSave}
-      disabled={!productStore.isProductChanged}
-      text="Save"
-    />
-  );
+  const handleCategories = (isChecked: any, data: any) => {
+    isChecked = isChecked.target.checked;
+    productStore.updateCategories(isChecked, data);
+  };
 
   return (
     <Grid
@@ -165,6 +159,11 @@ const UpdateProduct = function UpdateProduct() {
               }}
               type="number"
             />
+            <StyledLabel>Product Categories</StyledLabel>
+            <ProductCategories
+              handleCategories={handleCategories}
+              currentCategories={productStore.productToBeUpdated.categories}
+            />
             <StyledLabel>Image</StyledLabel>
             <img
               width="250"
@@ -172,7 +171,16 @@ const UpdateProduct = function UpdateProduct() {
               src={productStore.productToBeUpdated.images[0].src}
             />
           </Grid>
-          <FixedBottom button={<FixedButton />} />
+          <FixedBottom
+            button={
+              <Button
+                isLoading={productStore.loading}
+                onClick={handleSave}
+                disabled={!productStore.isProductChanged}
+                text="Save"
+              />
+            }
+          />
         </>
       ) : null}
     </Grid>

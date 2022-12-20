@@ -16,12 +16,11 @@ class searchStore {
   async getProducts(searchBy: string | null | undefined, value: any) {
     this.products = [];
     this.loading = true;
-
     axios({
       method: "get",
       url: productsEndPoint + "?" + token,
       params: {
-        searchBy: value,
+        sku: value,
       },
     }).then((response) => {
       if (response && response.data && response.data.length > 0) {

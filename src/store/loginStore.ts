@@ -1,6 +1,7 @@
 import { logInCredentials } from "../config/config";
 import { makeAutoObservable } from "mobx";
 import { isEqual } from "lodash";
+import { setLocalStorageUtil } from "../common/utils/updateLocalStorage";
 
 interface user {
   email: string | undefined;
@@ -26,11 +27,16 @@ class loginStore {
     if (isEqual(this.user, logInCredentials)) {
       this.isLoggedIn = true;
       this.error = false;
-      localStorage.setItem("isLoged", JSON.stringify(this.isLoggedIn));
+      setLocalStorageUtil(
+        "isLogedToken",
+        JSON.stringify(this.user.password),
+        true
+      );
+      // setLocalStorageUtil("isLoged", JSON.stringify(this.isLoggedIn));
     } else {
       this.isLoggedIn = false;
       this.error = true;
-      localStorage.setItem("isLoged", JSON.stringify(this.isLoggedIn));
+      // setLocalStorageUtil("isLoged", JSON.stringify(""));
     }
   }
 }

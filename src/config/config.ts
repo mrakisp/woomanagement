@@ -11,5 +11,5 @@ export const token =
 
 export const productsEndPoint =
   process.env.REACT_APP_WEBSITE + "/wp-json/wc/v3/products/";
-// export const productsEndPoint =
-//   process.env.REACT_APP_WEBSITE + "/wp-json/wc/v3/products?" + token;
+export const categoriesEndPoint =
+  process.env.REACT_APP_WEBSITE + "/wp-json/wc/v3/products/categories/";

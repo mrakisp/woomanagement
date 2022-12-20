@@ -11,6 +11,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { getLocalStorageUtil } from "../utils/updateLocalStorage";
 
 /* style components */
 const Error = styled.div`
@@ -32,7 +33,7 @@ const LoginForm = function LoginForm({ setIsLoggedIn }: LoginProps) {
     event.preventDefault();
     loginStore.login(emailRef.current?.value, passwordRef.current?.value);
     if (loginStore.isLoggedIn) {
-      setIsLoggedIn("true");
+      setIsLoggedIn(getLocalStorageUtil("isLogedToken", true));
     }
   };
 

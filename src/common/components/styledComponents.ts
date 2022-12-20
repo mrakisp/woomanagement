@@ -29,3 +29,13 @@ export const ActionButton = styled.button`
     background-color: #5084b8;
   }
 `;
+
+export const ListItemStyled = styled.li`
+  list-style: none;
+`;
+
+export const UlMaxHeightStyled = styled.ul`
+  padding: 0;
+  max-height: 300px;
+  overflow: auto;
+`;

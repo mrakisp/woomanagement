@@ -2,16 +2,18 @@ import React from "react";
 import LoginForm from "./common/views/LoginForm";
 import useLocalStorage from "./common/hooks/useLocalStorage";
 import TabPanel from "./common/views/dashboardTabs";
+import { logInCredentials } from "./config/config";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useLocalStorage<string>(
-    "isLoged",
-    "false"
+    "isLogedToken",
+    "false",
+    true
   );
 
   return (
     <div>
-      {isLoggedIn === "true" ? (
+      {isLoggedIn && logInCredentials.password === JSON.parse(isLoggedIn) ? (
         <TabPanel />
       ) : (
         <LoginForm setIsLoggedIn={setIsLoggedIn} />

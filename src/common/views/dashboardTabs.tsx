@@ -1,6 +1,10 @@
 import React from "react";
 import UpdateProductView from "../../views/updateProductView";
 import CreateProductView from "../../views/createProductView";
+import DashboardView from "../../views/dashboardView";
+// import categoriesStore from "../../store/categoriesStore";
+// import useLocalStorage from "../hooks/useLocalStorage";
+// import { toJS } from "mobx";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
@@ -33,8 +37,23 @@ function TabPanel(props: TabPanelProps) {
     </div>
   );
 }
+
 export default function CenteredTabs() {
   const [value, setValue] = React.useState(0);
+
+  // const [categories, setCategories] = useLocalStorage<string>(
+  //   "categories",
+  //   toJS(categoriesStore.productCategories)
+  // );
+
+  // useEffect(() => {
+  //   if (categories.length <= 0) {
+  //     categoriesStore.getProductCategories();
+  //     setCategories(toJS(categoriesStore.productCategories));
+  //   } else {
+  //     categoriesStore.setProductCategories(toJS(categories));
+  //   }
+  // }, []);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -54,7 +73,7 @@ export default function CenteredTabs() {
         <Tab label="Update Product" />
       </Tabs>
       <TabPanel value={value} index={0}>
-        dashboard
+        <DashboardView />
       </TabPanel>
       <TabPanel value={value} index={1}>
         <CreateProductView />

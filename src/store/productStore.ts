@@ -6,6 +6,7 @@ class productStore {
   productToBeUpdated: any | null = {};
   loading = false;
   isProductChanged = false;
+  selectedCategories: any = [];
 
   constructor() {
     makeAutoObservable(this);
@@ -21,7 +22,6 @@ class productStore {
       //   Authorization: `Basic ${process.env.TOKEN}`,
       // },
     }).then((response) => {
-      console.log("posted", response);
       this.loading = false;
     });
   }
@@ -34,7 +34,6 @@ class productStore {
       url: productsEndPoint + productData.id + "?" + token,
       data: productData,
     }).then((response) => {
-      console.log("posted", response);
       this.loading = false;
       this.isProductChanged = false;
     });
@@ -49,9 +48,23 @@ class productStore {
     this.isProductChanged = true;
   }
 
-  // setIsProductChanged() {
-  //   this.isProductChanged = true;
-  // }
+  updateCategories(isChecked: boolean, categories: any) {
+    if (isChecked) {
+      this.productToBeUpdated.categories = [
+        ...this.productToBeUpdated.categories,
+        categories,
+      ];
+    } else {
+      const indexOfObject = this.productToBeUpdated.categories.findIndex(
+        (object: any) => {
+          return object.id === categories.id;
+        }
+      );
+      this.productToBeUpdated.categories.splice(indexOfObject, 1);
+    }
+
+    this.isProductChanged = true;
+  }
 }
 
 const ProductStore = new productStore();

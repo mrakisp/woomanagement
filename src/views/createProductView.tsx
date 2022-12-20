@@ -79,6 +79,8 @@ const CreateProduct = function CreateProduct() {
           }}
           type="number"
         />
+        <StyledLabel>Product Categories</StyledLabel>
+        {/* <ProductCategories /> */}
       </Grid>
       <FixedBottom button={<FixedButton />} />
     </Grid>

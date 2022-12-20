@@ -49,12 +49,15 @@ const SearchInput = function SearchInput({
     if (searchType === searchProductsType) {
       setFetchResults(searchStore.products);
     }
-  }, [fetchedResults]);
+  }, [fetchedResults, searchType]);
 
   return (
     <Autocomplete
       sx={{ maxWidth: 500 }}
-      onInputChange={debounce((e) => searchByInputValue(e.target?.value), 1000)} // add delay to user typing
+      onInputChange={debounce(
+        (e) => searchByInputValue(e?.target?.value),
+        1000
+      )} // add delay to user typing
       filterOptions={(x) => x}
       isOptionEqualToValue={(fetchResults, value) =>
         fetchResults.name === value.name
