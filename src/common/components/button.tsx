@@ -1,12 +1,22 @@
 import * as React from "react";
 import LoadingButton from "@mui/lab/LoadingButton";
-import SaveIcon from "@mui/icons-material/Save";
 
 interface ButtonProps {
   isLoading?: boolean;
   onClick: any;
   text: string;
   disabled?: boolean;
+  icon?: React.ReactNode;
+  variant?: "text" | "contained" | "outlined" | undefined;
+  color?:
+    | "inherit"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "error"
+    | "info"
+    | "warning"
+    | undefined;
 }
 
 export default function Button({
@@ -14,6 +24,9 @@ export default function Button({
   text,
   disabled = false,
   onClick,
+  icon,
+  variant = "contained",
+  color,
 }: ButtonProps) {
   return (
     <LoadingButton
@@ -21,10 +34,12 @@ export default function Button({
       onClick={onClick}
       loading={isLoading}
       loadingPosition="end"
-      endIcon={<SaveIcon />}
-      variant="contained"
+      endIcon={icon}
+      variant={variant}
       disabled={disabled}
       size="large"
+      color={color}
+      sx={{ marginLeft: 5 }}
     >
       {text}
     </LoadingButton>

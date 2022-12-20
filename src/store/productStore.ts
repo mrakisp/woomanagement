@@ -7,6 +7,7 @@ class productStore {
   loading = false;
   isProductChanged = false;
   selectedCategories: any = [];
+  // initialProduct: any | null = {};
 
   constructor() {
     makeAutoObservable(this);
@@ -41,6 +42,7 @@ class productStore {
 
   setSelectedUpdateProduct(data: {}) {
     this.productToBeUpdated = data;
+    // this.initialProduct = data;
   }
 
   updateValueOfProduct(propertyToBeUpdated: string, value: any) {

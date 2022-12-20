@@ -15,9 +15,17 @@ import TextareaAutosize from "@mui/base/TextareaAutosize";
 import Grid from "@mui/material/Grid";
 import Button from "../common/components/button";
 import FixedBottom from "../common/components/fixedBottomContainer";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 const UpdateProduct = function UpdateProduct() {
   const handleSave = () => {
+    if (productStore.isProductChanged) {
+      productStore.updateProduct();
+    }
+  };
+
+  const handleCancel = () => {
     if (productStore.isProductChanged) {
       productStore.updateProduct();
     }
@@ -37,6 +45,26 @@ const UpdateProduct = function UpdateProduct() {
     productStore.updateCategories(isChecked.target.checked, data);
   };
 
+  const FixedFooterbuttons = [
+    <Button
+      // isLoading={productStore.loading}
+      onClick={handleCancel}
+      disabled={!productStore.isProductChanged}
+      text="Cancel"
+      key="button2"
+      color="error"
+      icon={<CancelIcon />}
+    />,
+    <Button
+      isLoading={productStore.loading}
+      onClick={handleSave}
+      disabled={!productStore.isProductChanged}
+      text="Save"
+      key="button1"
+      icon={<SaveIcon />}
+    />,
+  ];
+
   return (
     <Grid
       container
@@ -49,7 +77,7 @@ const UpdateProduct = function UpdateProduct() {
 
       {!isEmpty(productStore.productToBeUpdated) ? (
         <>
-          <Grid item xs={1}>
+          <Grid item xs={2} md={1}>
             <StyledLabel>Product Id</StyledLabel>
             <TextField
               id="filled-hidden-label-small"
@@ -59,7 +87,7 @@ const UpdateProduct = function UpdateProduct() {
               size="small"
             />
           </Grid>
-          <Grid item xs={1}>
+          <Grid item xs={2} md={1}>
             <StyledLabel>Product Sales</StyledLabel>
             <TextField
               id="filled-hidden-label-small"
@@ -69,7 +97,7 @@ const UpdateProduct = function UpdateProduct() {
               size="small"
             />
           </Grid>
-          <Grid item xs={1}>
+          <Grid item xs={2} md={1}>
             <StyledLabel>Low Stock</StyledLabel>
             <TextField
               id="filled-hidden-label-small"
@@ -176,16 +204,7 @@ const UpdateProduct = function UpdateProduct() {
               src={productStore.productToBeUpdated.images[0].src}
             />
           </Grid>
-          <FixedBottom
-            button={
-              <Button
-                isLoading={productStore.loading}
-                onClick={handleSave}
-                disabled={!productStore.isProductChanged}
-                text="Save"
-              />
-            }
-          />
+          <FixedBottom buttons={FixedFooterbuttons} />
         </>
       ) : null}
     </Grid>

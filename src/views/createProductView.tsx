@@ -82,7 +82,7 @@ const CreateProduct = function CreateProduct() {
         <StyledLabel>Product Categories</StyledLabel>
         {/* <ProductCategories /> */}
       </Grid>
-      <FixedBottom button={<FixedButton />} />
+      <FixedBottom buttons={<FixedButton />} />
     </Grid>
   );
 };
