@@ -39,7 +39,7 @@ class productStore {
     });
   }
 
-  setSelectedUpdateProduct(data: any) {
+  setSelectedUpdateProduct(data: {}) {
     this.productToBeUpdated = data;
   }
 

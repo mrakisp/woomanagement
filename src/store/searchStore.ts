@@ -1,11 +1,11 @@
 import { makeAutoObservable } from "mobx";
 import axios from "axios";
 import { productsEndPoint, token } from "../config/config";
-import ProductStore from "./productStore";
+import productStore from "./productStore";
 
 class searchStore {
   products: any = [];
-  selectedProduct: any = {};
+  selectedProduct: {} = {};
   loading: boolean = false;
 
   constructor() {
@@ -13,15 +13,16 @@ class searchStore {
   }
 
   /* PRODUCTS */
-  async getProducts(searchBy: string | null | undefined, value: any) {
+  async getProducts(searchBy: string, value: string) {
     this.products = [];
     this.loading = true;
+    let params: any = {};
+    params[searchBy] = value;
+
     axios({
       method: "get",
       url: productsEndPoint + "?" + token,
-      params: {
-        sku: value,
-      },
+      params: params,
     }).then((response) => {
       if (response && response.data && response.data.length > 0) {
         this.setSearchProductResults(response.data);
@@ -31,14 +32,18 @@ class searchStore {
     });
   }
 
-  setSearchProductResults(results: any) {
+  setSearchProductResults(results: []) {
     this.products = results;
     this.resetLoading();
   }
 
   setSelectedProduct() {
-    this.selectedProduct = this.products[0];
-    ProductStore.setSelectedUpdateProduct(this.products[0]);
+    if (this.products.length > 0) {
+      this.selectedProduct = this.products[0];
+      productStore.setSelectedUpdateProduct(this.products[0]);
+    } else {
+      console.log("Not Selected Product");
+    }
   }
 
   /* END PRODUCTS */

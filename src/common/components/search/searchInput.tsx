@@ -8,6 +8,7 @@ import searchStore from "../../../store/searchStore";
 import { debounce } from "lodash";
 import SearchOptionPreview from "./searchOptionPreview";
 import { searchProductsType } from "./searchTypes";
+import SearchIcon from "@mui/icons-material/Search";
 
 interface Product {
   name: string;
@@ -88,9 +89,11 @@ const SearchInput = function SearchInput({
                 {searchStore.loading ? (
                   <CircularProgress color="inherit" size={20} />
                 ) : null}
+
                 {params.InputProps.endAdornment}
               </>
             ),
+            startAdornment: <SearchIcon />,
           }}
         />
       )}

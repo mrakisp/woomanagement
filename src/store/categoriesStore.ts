@@ -11,7 +11,7 @@ interface Categories {
 }
 
 class productCategoriesStore {
-  productCategories: any = [];
+  productCategories: Categories[] = [];
   loading = false;
 
   constructor() {
@@ -41,7 +41,7 @@ class productCategoriesStore {
     });
   }
 
-  setProductCategories(data: any) {
+  setProductCategories(data: Categories[]) {
     this.productCategories = data;
   }
 }

@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import useLocalStorage from "../hooks/useLocalStorage";
 import categoriesStore from "../../store/categoriesStore";
-import { toJS } from "mobx";
 import { observer } from "mobx-react-lite";
 import Checkbox from "@mui/material/Checkbox";
 import {
@@ -10,7 +9,7 @@ import {
 } from "../../common/components/styledComponents";
 
 interface ProductCategoriesProps {
-  handleCategories: any;
+  handleCategories: (isChecked: any, data: {}) => void; //any;
   currentCategories: [];
 }
 
@@ -20,20 +19,22 @@ const ProductCategories = function ProductCategories({
 }: ProductCategoriesProps) {
   const [categories] = useLocalStorage<string>(
     "categories",
-    toJS(categoriesStore.productCategories)
+    JSON.parse(JSON.stringify(categoriesStore.productCategories))
   );
 
   useEffect(() => {
     if (categories.length <= 0) {
       categoriesStore.getProductCategories();
     } else {
-      categoriesStore.setProductCategories(categories);
+      categoriesStore.setProductCategories(
+        JSON.parse(JSON.stringify(categories))
+      );
     }
   }, [categories]);
 
   return (
     <UlMaxHeightStyled>
-      {categoriesStore.productCategories.map((category: any, index: any) =>
+      {categoriesStore.productCategories.map((category: any, index: number) =>
         category.parent === 0 ? (
           <ListItemStyled key={category.id}>
             <Checkbox

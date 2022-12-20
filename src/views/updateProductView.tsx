@@ -23,13 +23,18 @@ const UpdateProduct = function UpdateProduct() {
     }
   };
 
-  const handleInputChange = (propertyToBeUpdated: string, value: any) => {
+  const handleInputChange = (
+    propertyToBeUpdated: string,
+    value: string | number
+  ) => {
     productStore.updateValueOfProduct(propertyToBeUpdated, value);
   };
 
-  const handleCategories = (isChecked: any, data: any) => {
-    isChecked = isChecked.target.checked;
-    productStore.updateCategories(isChecked, data);
+  const handleCategories = (
+    isChecked: React.ChangeEvent<HTMLInputElement>,
+    data: {}
+  ) => {
+    productStore.updateCategories(isChecked.target.checked, data);
   };
 
   return (
