@@ -62,6 +62,7 @@ const UpdateProduct = function UpdateProduct() {
       text="Save"
       key="button1"
       icon={<SaveIcon />}
+      sx={{ marginLeft: 5 }}
     />,
   ];
 
@@ -153,32 +154,50 @@ const UpdateProduct = function UpdateProduct() {
               onChange={(e) => handleInputChange("sku", e.target.value)}
               size="small"
             />
-            <StyledLabel>Price</StyledLabel>
-            <TextField
-              id="filled-hidden-label-small"
-              defaultValue={productStore.productToBeUpdated.regular_price}
-              onChange={(e) =>
-                handleInputChange("regular_price", e.target.value)
-              }
-              size="small"
-              InputProps={{
-                inputProps: { min: 0 },
-                endAdornment: <InputAdornment position="end">€</InputAdornment>,
-              }}
-              type="number"
-            />
-            <StyledLabel>Sale Price</StyledLabel>
-            <TextField
-              id="filled-hidden-label-small"
-              defaultValue={productStore.productToBeUpdated.sale_price}
-              onChange={(e) => handleInputChange("sale_price", e.target.value)}
-              size="small"
-              InputProps={{
-                inputProps: { min: 0 },
-                endAdornment: <InputAdornment position="end">€</InputAdornment>,
-              }}
-              type="number"
-            />
+
+            <Grid
+              container
+              spacing={{ xs: 2, md: 3 }}
+              columns={{ xs: 4, sm: 8, md: 12 }}
+            >
+              <Grid item xs={6}>
+                <StyledLabel>Price</StyledLabel>
+                <TextField
+                  id="filled-hidden-label-small"
+                  defaultValue={productStore.productToBeUpdated.regular_price}
+                  onChange={(e) =>
+                    handleInputChange("regular_price", e.target.value)
+                  }
+                  size="small"
+                  InputProps={{
+                    inputProps: { min: 0 },
+                    endAdornment: (
+                      <InputAdornment position="end">€</InputAdornment>
+                    ),
+                  }}
+                  type="number"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <StyledLabel>Sale Price</StyledLabel>
+                <TextField
+                  id="filled-hidden-label-small"
+                  defaultValue={productStore.productToBeUpdated.sale_price}
+                  onChange={(e) =>
+                    handleInputChange("sale_price", e.target.value)
+                  }
+                  size="small"
+                  InputProps={{
+                    inputProps: { min: 0 },
+                    endAdornment: (
+                      <InputAdornment position="end">€</InputAdornment>
+                    ),
+                  }}
+                  type="number"
+                />
+              </Grid>
+            </Grid>
+
             <StyledLabel>Stock Quantity</StyledLabel>
             <TextField
               id="filled-hidden-label-small"

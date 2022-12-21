@@ -8,6 +8,8 @@ interface ButtonProps {
   disabled?: boolean;
   icon?: React.ReactNode;
   variant?: "text" | "contained" | "outlined" | undefined;
+  size?: "small" | "large" | "medium" | undefined;
+  sx?: any;
   color?:
     | "inherit"
     | "primary"
@@ -27,6 +29,8 @@ export default function Button({
   icon,
   variant = "contained",
   color,
+  size = "large",
+  sx,
 }: ButtonProps) {
   return (
     <LoadingButton
@@ -36,9 +40,9 @@ export default function Button({
       endIcon={icon}
       variant={variant}
       disabled={disabled}
-      size="large"
+      size={size}
       color={color}
-      sx={{ marginLeft: 5 }}
+      sx={sx}
     >
       {text}
     </LoadingButton>

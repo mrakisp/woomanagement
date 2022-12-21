@@ -3,6 +3,9 @@ import useLocalStorage from "../hooks/useLocalStorage";
 import categoriesStore from "../../store/categoriesStore";
 import { observer } from "mobx-react-lite";
 import Checkbox from "@mui/material/Checkbox";
+import Button from "./button";
+
+import CachedIcon from "@mui/icons-material/Cached";
 import {
   ListItemStyled,
   UlMaxHeightStyled,
@@ -32,28 +35,23 @@ const ProductCategories = function ProductCategories({
     }
   }, [categories]);
 
+  const reSyncCategories = () => {
+    categoriesStore.getProductCategories();
+  };
+
   return (
-    <UlMaxHeightStyled>
-      {categoriesStore.productCategories.map((category: any, index: number) =>
-        category.parent === 0 ? (
-          <ListItemStyled key={category.id}>
-            <Checkbox
-              key={category.id}
-              checked={currentCategories.some(
-                (element: any) => element.id === category.id
-              )}
-              onClick={(e) =>
-                handleCategories(e, {
-                  id: category.id,
-                  name: category.name,
-                  slug: category.slug,
-                })
-              }
-            />
-            {category.name}
-          </ListItemStyled>
-        ) : (
-          <ul key={index}>
+    <>
+      <Button
+        onClick={reSyncCategories}
+        text="Sync"
+        size="small"
+        icon={<CachedIcon />}
+        sx={{ display: "flex", marginLeft: "auto" }}
+      />
+
+      <UlMaxHeightStyled>
+        {categoriesStore.productCategories.map((category: any, index: number) =>
+          category.parent === 0 ? (
             <ListItemStyled key={category.id}>
               <Checkbox
                 key={category.id}
@@ -70,10 +68,29 @@ const ProductCategories = function ProductCategories({
               />
               {category.name}
             </ListItemStyled>
-          </ul>
-        )
-      )}
-    </UlMaxHeightStyled>
+          ) : (
+            <ul key={index}>
+              <ListItemStyled key={category.id}>
+                <Checkbox
+                  key={category.id}
+                  checked={currentCategories.some(
+                    (element: any) => element.id === category.id
+                  )}
+                  onClick={(e) =>
+                    handleCategories(e, {
+                      id: category.id,
+                      name: category.name,
+                      slug: category.slug,
+                    })
+                  }
+                />
+                {category.name}
+              </ListItemStyled>
+            </ul>
+          )
+        )}
+      </UlMaxHeightStyled>
+    </>
   );
 };
 

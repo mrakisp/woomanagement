@@ -32,10 +32,21 @@ export const ActionButton = styled.button`
 
 export const ListItemStyled = styled.li`
   list-style: none;
+  display: flex;
+  align-items: center;
 `;
 
 export const UlMaxHeightStyled = styled.ul`
   padding: 0;
   max-height: 300px;
   overflow: auto;
+  border: 1px solid #eee;
+  padding: 10px;
+  box-shadow: 0px 0 1px 0px #174776;
+  & span {
+    padding: 3px; 5px;
+  }
+  & ul {
+    padding-left: 20px;
+  }
 `;
