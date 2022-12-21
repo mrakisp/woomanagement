@@ -26,6 +26,7 @@ class searchStore {
     }).then((response) => {
       if (response && response.data && response.data.length > 0) {
         this.setSearchProductResults(response.data);
+        this.setInitalRetrievedProduct(response.data[0]);
       } else {
         this.resetLoading();
       }
@@ -44,6 +45,10 @@ class searchStore {
     } else {
       console.log("Not Selected Product");
     }
+  }
+
+  setInitalRetrievedProduct(data: {}) {
+    productStore.setInitialProduct(data);
   }
 
   /* END PRODUCTS */

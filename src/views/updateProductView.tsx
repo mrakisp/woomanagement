@@ -26,9 +26,7 @@ const UpdateProduct = function UpdateProduct() {
   };
 
   const handleCancel = () => {
-    if (productStore.isProductChanged) {
-      productStore.updateProduct();
-    }
+    productStore.resetToDefaultProduct();
   };
 
   const handleInputChange = (
@@ -120,7 +118,7 @@ const UpdateProduct = function UpdateProduct() {
             <TextField
               fullWidth
               id="filled-hidden-label-small"
-              defaultValue={productStore.productToBeUpdated.name}
+              value={productStore.productToBeUpdated.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
               size="small"
             />
@@ -129,7 +127,7 @@ const UpdateProduct = function UpdateProduct() {
             <TextareaAutosize
               aria-label="minimum height"
               minRows={10}
-              defaultValue={productStore.productToBeUpdated.description}
+              value={productStore.productToBeUpdated.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
               style={{ width: "100%" }}
             />
@@ -138,7 +136,7 @@ const UpdateProduct = function UpdateProduct() {
             <TextareaAutosize
               aria-label="minimum height"
               minRows={5}
-              defaultValue={productStore.productToBeUpdated.short_description}
+              value={productStore.productToBeUpdated.short_description}
               onChange={(e) =>
                 handleInputChange("short_description", e.target.value)
               }
@@ -150,7 +148,7 @@ const UpdateProduct = function UpdateProduct() {
             <StyledLabel>Sku</StyledLabel>
             <TextField
               id="filled-hidden-label-small"
-              defaultValue={productStore.productToBeUpdated.sku}
+              value={productStore.productToBeUpdated.sku}
               onChange={(e) => handleInputChange("sku", e.target.value)}
               size="small"
             />
@@ -164,7 +162,7 @@ const UpdateProduct = function UpdateProduct() {
                 <StyledLabel>Price</StyledLabel>
                 <TextField
                   id="filled-hidden-label-small"
-                  defaultValue={productStore.productToBeUpdated.regular_price}
+                  value={productStore.productToBeUpdated.regular_price}
                   onChange={(e) =>
                     handleInputChange("regular_price", e.target.value)
                   }
@@ -182,7 +180,7 @@ const UpdateProduct = function UpdateProduct() {
                 <StyledLabel>Sale Price</StyledLabel>
                 <TextField
                   id="filled-hidden-label-small"
-                  defaultValue={productStore.productToBeUpdated.sale_price}
+                  value={productStore.productToBeUpdated.sale_price}
                   onChange={(e) =>
                     handleInputChange("sale_price", e.target.value)
                   }
@@ -201,7 +199,7 @@ const UpdateProduct = function UpdateProduct() {
             <StyledLabel>Stock Quantity</StyledLabel>
             <TextField
               id="filled-hidden-label-small"
-              defaultValue={productStore.productToBeUpdated.stock_quantity}
+              value={productStore.productToBeUpdated.stock_quantity}
               onChange={(e) =>
                 handleInputChange("stock_quantity", parseInt(e.target.value))
               }

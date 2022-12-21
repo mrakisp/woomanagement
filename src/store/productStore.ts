@@ -7,7 +7,7 @@ class productStore {
   loading = false;
   isProductChanged = false;
   selectedCategories: any = [];
-  // initialProduct: any | null = {};
+  initialProduct: any | null = {};
 
   constructor() {
     makeAutoObservable(this);
@@ -42,7 +42,18 @@ class productStore {
 
   setSelectedUpdateProduct(data: {}) {
     this.productToBeUpdated = data;
-    // this.initialProduct = data;
+  }
+
+  resetToDefaultProduct() {
+    for (var k in this.productToBeUpdated)
+      this.productToBeUpdated[k] = this.initialProduct[k];
+
+    // this.productToBeUpdated = this.initialProduct;
+    this.isProductChanged = false;
+  }
+
+  setInitialProduct(data: {}) {
+    this.initialProduct = data;
   }
 
   updateValueOfProduct(propertyToBeUpdated: string, value: any) {
