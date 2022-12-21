@@ -33,7 +33,9 @@ const UpdateProduct = function UpdateProduct() {
     propertyToBeUpdated: string,
     value: string | number
   ) => {
-    productStore.updateValueOfProduct(propertyToBeUpdated, value);
+    if (isValidInput(propertyToBeUpdated, value)) {
+      productStore.updateValueOfProduct(propertyToBeUpdated, value);
+    }
   };
 
   const handleCategories = (
@@ -43,9 +45,18 @@ const UpdateProduct = function UpdateProduct() {
     productStore.updateCategories(isChecked.target.checked, data);
   };
 
+  const isValidInput = (propName: string, value: number | string) => {
+    if (
+      propName === "sale_price" &&
+      Number(value) >= Number(productStore.productToBeUpdated.regular_price)
+    ) {
+      return false;
+    }
+    return true;
+  };
+
   const FixedFooterbuttons = [
     <Button
-      // isLoading={productStore.loading}
       onClick={handleCancel}
       disabled={!productStore.isProductChanged}
       text="Cancel"
@@ -186,7 +197,10 @@ const UpdateProduct = function UpdateProduct() {
                   }
                   size="small"
                   InputProps={{
-                    inputProps: { min: 0 },
+                    inputProps: {
+                      min: 0,
+                      //max: productStore.productToBeUpdated.regular_price,
+                    },
                     endAdornment: (
                       <InputAdornment position="end">€</InputAdornment>
                     ),

@@ -1,6 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import axios from "axios";
 import { productsEndPoint, token } from "../config/config";
+import { filter } from "lodash";
 
 class productStore {
   productToBeUpdated: any | null = {};
@@ -8,6 +9,7 @@ class productStore {
   isProductChanged = false;
   selectedCategories: any = [];
   initialProduct: any | null = {};
+  dataToBeUpdated: any = {};
 
   constructor() {
     makeAutoObservable(this);
@@ -19,9 +21,6 @@ class productStore {
       method: "post",
       url: productsEndPoint,
       data: data,
-      // headers: {
-      //   Authorization: `Basic ${process.env.TOKEN}`,
-      // },
     }).then((response) => {
       this.loading = false;
     });
@@ -30,25 +29,26 @@ class productStore {
   updateProduct() {
     this.loading = true;
     const productData = this.productToBeUpdated;
+
     axios({
-      method: "post",
+      method: "put",
       url: productsEndPoint + productData.id + "?" + token,
-      data: productData,
+      data: this.dataToBeUpdated,
     }).then((response) => {
-      this.loading = false;
-      this.isProductChanged = false;
+      this.resetLoading();
+      this.initialProduct = response.data;
     });
   }
 
-  setSelectedUpdateProduct(data: {}) {
+  setSelectedUpdateProduct(data: {} | any) {
     this.productToBeUpdated = data;
+    this.dataToBeUpdated.categories = data.categories;
   }
 
   resetToDefaultProduct() {
     for (var k in this.productToBeUpdated)
       this.productToBeUpdated[k] = this.initialProduct[k];
 
-    // this.productToBeUpdated = this.initialProduct;
     this.isProductChanged = false;
   }
 
@@ -58,6 +58,7 @@ class productStore {
 
   updateValueOfProduct(propertyToBeUpdated: string, value: any) {
     this.productToBeUpdated[propertyToBeUpdated] = value;
+    this.dataToBeUpdated[propertyToBeUpdated] = value;
     this.isProductChanged = true;
   }
 
@@ -67,16 +68,31 @@ class productStore {
         ...this.productToBeUpdated.categories,
         categories,
       ];
+      this.dataToBeUpdated.categories = [
+        ...this.dataToBeUpdated.categories,
+        categories,
+      ];
     } else {
-      const indexOfObject = this.productToBeUpdated.categories.findIndex(
-        (object: any) => {
-          return object.id === categories.id;
+      this.productToBeUpdated.categories = filter(
+        this.productToBeUpdated.categories,
+        function (x) {
+          return x.id !== categories.id;
         }
       );
-      this.productToBeUpdated.categories.splice(indexOfObject, 1);
+      this.dataToBeUpdated.categories = filter(
+        this.productToBeUpdated.categories,
+        function (x) {
+          return x.id !== categories.id;
+        }
+      );
     }
 
     this.isProductChanged = true;
+  }
+
+  resetLoading() {
+    this.loading = false;
+    this.isProductChanged = false;
   }
 }
 
