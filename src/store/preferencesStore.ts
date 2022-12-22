@@ -4,6 +4,7 @@ import { getLocalStorageUtil } from "../common/utils/setGetLocalStorage";
 class preferencesStore {
   preferences = {
     showWeight: true,
+    showFeatured: true,
   };
 
   constructor() {

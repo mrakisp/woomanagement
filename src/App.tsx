@@ -1,7 +1,7 @@
 import React from "react";
-import LoginForm from "./common/views/LoginForm";
+import LoginForm from "./views/LoginForm";
 import useLocalStorage from "./common/hooks/useLocalStorage";
-import TabPanel from "./common/views/dashboardTabs";
+import TabPanel from "./common/components/dashboardTabs";
 import { logInCredentials } from "./config/config";
 
 function App() {

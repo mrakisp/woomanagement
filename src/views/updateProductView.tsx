@@ -17,8 +17,8 @@ import Button from "../common/components/button";
 import FixedBottom from "../common/components/fixedBottomContainer";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
-import Box from "@mui/material/Box";
 import preferencesStore from "../store/preferencesStore";
+import Switch from "@mui/material/Switch";
 
 const UpdateProduct = function UpdateProduct() {
   useEffect(() => {
@@ -37,7 +37,7 @@ const UpdateProduct = function UpdateProduct() {
 
   const handleInputChange = (
     propertyToBeUpdated: string,
-    value: string | number
+    value: string | number | boolean
   ) => {
     if (isValidInput(propertyToBeUpdated, value)) {
       productStore.updateValueOfProduct(propertyToBeUpdated, value);
@@ -51,7 +51,7 @@ const UpdateProduct = function UpdateProduct() {
     productStore.updateCategories(isChecked.target.checked, data);
   };
 
-  const isValidInput = (propName: string, value: number | string) => {
+  const isValidInput = (propName: string, value: number | string | boolean) => {
     if (
       propName === "sale_price" &&
       Number(value) >= Number(productStore.productToBeUpdated.regular_price)
@@ -89,6 +89,15 @@ const UpdateProduct = function UpdateProduct() {
     >
       <Grid item xs={9}>
         <SearchInput searchType={searchProductsType} searchBy={searchBySku} />
+        {!isEmpty(productStore.productToBeUpdated) && (
+          <a
+            rel="noreferrer"
+            href={productStore.productToBeUpdated.permalink}
+            target="_blank"
+          >
+            View Product
+          </a>
+        )}
       </Grid>
 
       {!isEmpty(productStore.productToBeUpdated) ? (
@@ -148,10 +157,6 @@ const UpdateProduct = function UpdateProduct() {
               onChange={(e) => handleInputChange("description", e.target.value)}
               style={{ width: "100%" }}
             />
-            {/* TO DO */}
-            <Box>
-              {preferencesStore.preferences.showWeight ? "SHOW" : "HIDDEN"}
-            </Box>
 
             <StyledLabel>Short Description</StyledLabel>
             <TextareaAutosize
@@ -163,16 +168,70 @@ const UpdateProduct = function UpdateProduct() {
               }
               style={{ width: "100%" }}
             />
+            {preferencesStore.preferences.showWeight && (
+              <>
+                <StyledLabel>Weight</StyledLabel>
+                <TextField
+                  id="filled-hidden-label-small"
+                  value={productStore.productToBeUpdated.weight}
+                  onChange={(e) => handleInputChange("weight", e.target.value)}
+                  size="small"
+                />
+              </>
+            )}
+            {/* {preferencesStore.preferences.showFeatured && (
+              <>
+                <StyledLabel>Featured</StyledLabel>
+                <Switch
+                  // value={
+                  //   String(productStore.productToBeUpdated.featured) === "true"
+                  //     ? "false"
+                  //     : "true"
+                  // }
+                  onChange={(e) =>
+                    handleInputChange("featured", Boolean(e.target.value))
+                  }
+                  checked={!productStore.productToBeUpdated.featured}
+                />
+              </>
+            )} */}
           </Grid>
 
           <Grid item xs={3}>
-            <StyledLabel>Sku</StyledLabel>
-            <TextField
-              id="filled-hidden-label-small"
-              value={productStore.productToBeUpdated.sku}
-              onChange={(e) => handleInputChange("sku", e.target.value)}
-              size="small"
-            />
+            <Grid
+              container
+              spacing={{ xs: 2, md: 3 }}
+              columns={{ xs: 4, sm: 8, md: 12 }}
+            >
+              <Grid item xs={6}>
+                <StyledLabel>Sku</StyledLabel>
+                <TextField
+                  id="filled-hidden-label-small"
+                  value={productStore.productToBeUpdated.sku}
+                  onChange={(e) => handleInputChange("sku", e.target.value)}
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <StyledLabel>Status</StyledLabel>
+                <span style={{ textTransform: "capitalize" }}>
+                  {productStore.productToBeUpdated.status}
+                </span>
+                <Switch
+                  value={
+                    productStore.productToBeUpdated.status === "publish"
+                      ? "draft"
+                      : "publish"
+                  }
+                  onChange={(e) => handleInputChange("status", e.target.value)}
+                  checked={
+                    productStore.productToBeUpdated.status === "publish"
+                      ? true
+                      : false
+                  }
+                />
+              </Grid>
+            </Grid>
 
             <Grid
               container
@@ -218,20 +277,26 @@ const UpdateProduct = function UpdateProduct() {
                 />
               </Grid>
             </Grid>
-
-            <StyledLabel>Stock Quantity</StyledLabel>
-            <TextField
-              id="filled-hidden-label-small"
-              value={productStore.productToBeUpdated.stock_quantity}
-              onChange={(e) =>
-                handleInputChange("stock_quantity", parseInt(e.target.value))
-              }
-              size="small"
-              InputProps={{
-                inputProps: { min: 0 },
-              }}
-              type="number"
-            />
+            {productStore.productToBeUpdated.manage_stock && (
+              <>
+                <StyledLabel>Stock Quantity</StyledLabel>
+                <TextField
+                  id="filled-hidden-label-small"
+                  value={productStore.productToBeUpdated.stock_quantity}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "stock_quantity",
+                      parseInt(e.target.value)
+                    )
+                  }
+                  size="small"
+                  InputProps={{
+                    inputProps: { min: 0 },
+                  }}
+                  type="number"
+                />
+              </>
+            )}
             <StyledLabel>Product Categories</StyledLabel>
             <ProductCategories
               handleCategories={handleCategories}

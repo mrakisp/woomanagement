@@ -15,7 +15,7 @@ export default function Preferences({ visible }: PreferencesProps) {
   const handleClose = () => setOpen(false);
   const [preferences, setPreferences] = useLocalStorage<string>(
     "preferences",
-    JSON.parse(JSON.stringify({ showWeight: true, showDimensions: true }))
+    JSON.parse(JSON.stringify({ showWeight: true, showFeatured: true }))
   );
 
   const handleChange = (switchVal: any) => {
@@ -35,9 +35,14 @@ export default function Preferences({ visible }: PreferencesProps) {
         Show Weight{" "}
         <Switch
           value="showWeight"
-          inputProps={{ "aria-label": "controlled" }}
           onChange={handleChange}
           checked={JSON.parse(JSON.stringify(preferences)).showWeight}
+        />
+        Show Featured{" "}
+        <Switch
+          value="showFeatured"
+          onChange={handleChange}
+          checked={JSON.parse(JSON.stringify(preferences)).showFeatured}
         />
       </>
     );

@@ -5,6 +5,7 @@ import { observer } from "mobx-react-lite";
 import Checkbox from "@mui/material/Checkbox";
 import Button from "./button";
 import TextField from "@mui/material/TextField";
+import Alert from "@mui/material/Alert";
 
 import CachedIcon from "@mui/icons-material/Cached";
 import {
@@ -17,6 +18,17 @@ interface ProductCategoriesProps {
   currentCategories: [];
 }
 
+// const style = {
+//   WebkitTransition: "opacity 3s ease-in-out",
+//   MozTransition: "opacity 3s ease-in-out",
+//   msTransition: "opacity 3s ease-in-out",
+//   OTransition: "opacity 3s ease-in-out",
+//   // transition: visibility 0s, opacity 0.5s linear;
+//   opacity: 0,
+// };
+
+// const intervalMsg = setInterval(function () {element.innerHTML += "Hello"}, 1000);;
+
 const ProductCategories = function ProductCategories({
   handleCategories,
   currentCategories,
@@ -25,9 +37,15 @@ const ProductCategories = function ProductCategories({
     "categories",
     JSON.parse(JSON.stringify(categoriesStore.productCategories))
   );
+  const [isSynchMessageVisible, setSsSynchMessageVisible] = useState(false);
   const [searchCategory, setSearchCategory] = useState<string>("");
+
   const reSyncCategories = () => {
+    setSsSynchMessageVisible(true);
     categoriesStore.getProductCategories();
+    setTimeout(() => {
+      setSsSynchMessageVisible(false);
+    }, 1500);
   };
 
   const handleSearch = (
@@ -67,6 +85,17 @@ const ProductCategories = function ProductCategories({
         sx={{ marginLeft: "25px" }}
         // sx={{ display: "flex", marginLeft: "auto" }}
       />
+
+      <Alert
+        variant="filled"
+        severity="success"
+        sx={{
+          width: "100%",
+          display: isSynchMessageVisible ? "flex" : "none",
+        }}
+      >
+        Categories Updated
+      </Alert>
 
       <UlMaxHeightStyled>
         {categoriesStore.productCategories.map((category: any, index: number) =>

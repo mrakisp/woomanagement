@@ -56,7 +56,10 @@ class productStore {
     this.initialProduct = data;
   }
 
-  updateValueOfProduct(propertyToBeUpdated: string, value: any) {
+  updateValueOfProduct(
+    propertyToBeUpdated: string,
+    value: string | number | boolean
+  ) {
     this.productToBeUpdated[propertyToBeUpdated] = value;
     this.dataToBeUpdated[propertyToBeUpdated] = value;
     this.isProductChanged = true;
