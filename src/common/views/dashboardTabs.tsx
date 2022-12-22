@@ -1,13 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import UpdateProductView from "../../views/updateProductView";
 import CreateProductView from "../../views/createProductView";
 import DashboardView from "../../views/dashboardView";
-// import categoriesStore from "../../store/categoriesStore";
-// import useLocalStorage from "../hooks/useLocalStorage";
 // import { toJS } from "mobx";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
+import Preferences from "../components/preferences/preferences";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -39,21 +38,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export default function CenteredTabs() {
-  const [value, setValue] = React.useState(0);
-
-  // const [categories, setCategories] = useLocalStorage<string>(
-  //   "categories",
-  //   toJS(categoriesStore.productCategories)
-  // );
-
-  // useEffect(() => {
-  //   if (categories.length <= 0) {
-  //     categoriesStore.getProductCategories();
-  //     setCategories(toJS(categoriesStore.productCategories));
-  //   } else {
-  //     categoriesStore.setProductCategories(toJS(categories));
-  //   }
-  // }, []);
+  const [value, setValue] = useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -71,6 +56,7 @@ export default function CenteredTabs() {
         <Tab label="Dashboard" />
         <Tab label="Create Product" />
         <Tab label="Update Product" />
+        <Preferences visible={value === 1 || value === 2} />
       </Tabs>
       <TabPanel value={value} index={0}>
         <DashboardView />

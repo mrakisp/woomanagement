@@ -48,7 +48,7 @@ const ProductCategories = function ProductCategories({
   }, [categories]);
 
   return (
-    <>
+    <div style={{ marginTop: "15px" }}>
       <TextField
         label="Search Category"
         variant="outlined"
@@ -144,7 +144,7 @@ const ProductCategories = function ProductCategories({
           )
         )}
       </UlMaxHeightStyled>
-    </>
+    </div>
   );
 };
 

@@ -1,7 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import axios from "axios";
 import { categoriesEndPoint, token } from "../config/config";
-import { setLocalStorageUtil } from "../common/utils/updateLocalStorage";
+import { setLocalStorageUtil } from "../common/utils/setGetLocalStorage";
 
 interface Categories {
   name: string;

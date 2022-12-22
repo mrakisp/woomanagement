@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import productStore from "../store/productStore";
 import ProductCategories from "../common/components/productCategories";
 import SearchInput from "../common/components/search/searchInput";
@@ -17,8 +17,14 @@ import Button from "../common/components/button";
 import FixedBottom from "../common/components/fixedBottomContainer";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
+import Box from "@mui/material/Box";
+import preferencesStore from "../store/preferencesStore";
 
 const UpdateProduct = function UpdateProduct() {
+  useEffect(() => {
+    preferencesStore.getPreferences();
+  }, []);
+
   const handleSave = () => {
     if (productStore.isProductChanged) {
       productStore.updateProduct();
@@ -142,6 +148,10 @@ const UpdateProduct = function UpdateProduct() {
               onChange={(e) => handleInputChange("description", e.target.value)}
               style={{ width: "100%" }}
             />
+            {/* TO DO */}
+            <Box>
+              {preferencesStore.preferences.showWeight ? "SHOW" : "HIDDEN"}
+            </Box>
 
             <StyledLabel>Short Description</StyledLabel>
             <TextareaAutosize
@@ -199,7 +209,6 @@ const UpdateProduct = function UpdateProduct() {
                   InputProps={{
                     inputProps: {
                       min: 0,
-                      //max: productStore.productToBeUpdated.regular_price,
                     },
                     endAdornment: (
                       <InputAdornment position="end">€</InputAdornment>

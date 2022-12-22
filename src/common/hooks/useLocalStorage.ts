@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
   setLocalStorageUtil,
   getLocalStorageUtil,
-} from "../utils/updateLocalStorage";
+} from "../utils/setGetLocalStorage";
 
 // Hook
 export default function useLocalStorage<T>(
