@@ -34,6 +34,7 @@ export const ListItemStyled = styled.li`
   list-style: none;
   display: flex;
   align-items: center;
+  display: ${(props) => (props.hidden ? "none" : "flex")};
 `;
 
 export const UlMaxHeightStyled = styled.ul`
