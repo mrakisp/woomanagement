@@ -34,7 +34,11 @@ const ProductCategories = function ProductCategories({
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     const searchedValue = e?.target.value.toLowerCase();
-    if (searchedValue) setSearchCategory(searchedValue);
+    if (searchedValue && searchedValue.length > 0) {
+      setSearchCategory(searchedValue);
+    } else {
+      setSearchCategory("");
+    }
   };
 
   useEffect(() => {
