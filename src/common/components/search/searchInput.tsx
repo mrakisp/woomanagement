@@ -18,7 +18,7 @@ interface Product {
 }
 
 interface SearchProps {
-  searchBy: string;
+  searchBy: { key: string; name: string };
   searchType: string;
 }
 
@@ -28,12 +28,13 @@ const SearchInput = function SearchInput({
 }: SearchProps) {
   const [fetchResults, setFetchResults] = useState<Product[]>([]);
   const fetchedResults = searchStore.products.length > 0 ? true : false;
-  const searchLabel = `Search by ${searchBy}`;
+  const searchLabel = `Search by ${searchBy.name}`;
+  const searchByKey = searchBy.key;
 
   const searchByInputValue = (value: string) => {
     if (value && value.length > 3) {
       if (searchType === searchProductsType) {
-        searchStore.getProducts(searchBy, value);
+        searchStore.getProducts(searchByKey, value);
       }
     }
   };

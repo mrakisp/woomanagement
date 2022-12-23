@@ -15,13 +15,13 @@ export default function Preferences({ visible }: PreferencesProps) {
   const handleClose = () => setOpen(false);
   const [preferences, setPreferences] = useLocalStorage<string>(
     "preferences",
-    JSON.parse(JSON.stringify({ showWeight: true, showFeatured: true }))
+    JSON.parse(
+      JSON.stringify({ showWeight: true, showFeatured: true, showSlug: true })
+    )
   );
 
   const handleChange = (switchVal: any) => {
     const updatedPreferences = JSON.parse(JSON.stringify(preferences));
-    updatedPreferences.showWeight = false;
-
     updatedPreferences[switchVal.target.value] = switchVal.target.checked
       ? true
       : false;
@@ -38,11 +38,11 @@ export default function Preferences({ visible }: PreferencesProps) {
           onChange={handleChange}
           checked={JSON.parse(JSON.stringify(preferences)).showWeight}
         />
-        Show Featured{" "}
+        Show Slug{" "}
         <Switch
-          value="showFeatured"
+          value="showSlug"
           onChange={handleChange}
-          checked={JSON.parse(JSON.stringify(preferences)).showFeatured}
+          checked={JSON.parse(JSON.stringify(preferences)).showSlug}
         />
       </>
     );

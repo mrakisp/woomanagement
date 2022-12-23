@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import productStore from "../store/productStore";
+import preferencesStore from "../store/preferencesStore";
 import ProductCategories from "../common/components/productCategories";
 import SearchInput from "../common/components/search/searchInput";
 import { observer } from "mobx-react-lite";
@@ -7,20 +8,24 @@ import { isEmpty } from "lodash";
 import {
   searchProductsType,
   searchBySku,
+  searchBySearch,
 } from "../common/components/search/searchTypes";
+import Button from "../common/components/button";
+import FixedBottom from "../common/components/fixedBottomContainer";
 import { StyledLabel } from "../common/components/styledComponents";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextareaAutosize from "@mui/base/TextareaAutosize";
 import Grid from "@mui/material/Grid";
-import Button from "../common/components/button";
-import FixedBottom from "../common/components/fixedBottomContainer";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
-import preferencesStore from "../store/preferencesStore";
 import Switch from "@mui/material/Switch";
+import PreviewIcon from "@mui/icons-material/Preview";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const UpdateProduct = function UpdateProduct() {
+  const [isSearchBySku, setIsSearchBySku] = useState(true);
+
   useEffect(() => {
     preferencesStore.getPreferences();
   }, []);
@@ -44,6 +49,14 @@ const UpdateProduct = function UpdateProduct() {
     }
   };
 
+  const handlePreview = () => {
+    window.open(productStore.productToBeUpdated.permalink, "_blank");
+  };
+
+  const handleDelete = () => {
+    productStore.deleteProduct();
+  };
+
   const handleCategories = (
     isChecked: React.ChangeEvent<HTMLInputElement>,
     data: {}
@@ -63,19 +76,36 @@ const UpdateProduct = function UpdateProduct() {
 
   const FixedFooterbuttons = [
     <Button
+      onClick={handleDelete}
+      text="Delete Product"
+      key="button1"
+      size="small"
+      color="error"
+      icon={<DeleteIcon />}
+      sx={{ marginRight: "auto" }}
+    />,
+
+    <Button
+      onClick={handlePreview}
+      text="View Product"
+      key="button2"
+      icon={<PreviewIcon />}
+    />,
+    <Button
       onClick={handleCancel}
       disabled={!productStore.isProductChanged}
-      text="Cancel"
-      key="button2"
-      color="error"
+      text="Cancel Changes"
+      key="button3"
+      color="warning"
       icon={<CancelIcon />}
+      sx={{ marginLeft: 5 }}
     />,
     <Button
       isLoading={productStore.loading}
       onClick={handleSave}
       disabled={!productStore.isProductChanged}
       text="Save"
-      key="button1"
+      key="button4"
       icon={<SaveIcon />}
       sx={{ marginLeft: 5 }}
     />,
@@ -88,21 +118,35 @@ const UpdateProduct = function UpdateProduct() {
       columns={{ xs: 4, sm: 8, md: 12 }}
     >
       <Grid item xs={9}>
-        <SearchInput searchType={searchProductsType} searchBy={searchBySku} />
-        {!isEmpty(productStore.productToBeUpdated) && (
-          <a
-            rel="noreferrer"
-            href={productStore.productToBeUpdated.permalink}
-            target="_blank"
-          >
-            View Product
-          </a>
-        )}
+        <Grid
+          container
+          spacing={{ xs: 2, md: 3 }}
+          columns={{ xs: 4, sm: 8, md: 12 }}
+        >
+          <Grid item xs={6} md={4}>
+            {isSearchBySku ? (
+              <SearchInput
+                searchType={searchProductsType}
+                searchBy={searchBySku}
+              />
+            ) : (
+              <SearchInput
+                searchType={searchProductsType}
+                searchBy={searchBySearch}
+              />
+            )}
+          </Grid>
+          <Grid item xs={3}>
+            Change Search
+            <br />
+            <Switch onChange={(e) => setIsSearchBySku(!isSearchBySku)} />
+          </Grid>
+        </Grid>
       </Grid>
 
       {!isEmpty(productStore.productToBeUpdated) ? (
         <>
-          <Grid item xs={2} md={1}>
+          <Grid item xs={2} sm={2} md={1}>
             <StyledLabel>Product Id</StyledLabel>
             <TextField
               id="filled-hidden-label-small"
@@ -112,7 +156,7 @@ const UpdateProduct = function UpdateProduct() {
               size="small"
             />
           </Grid>
-          <Grid item xs={2} md={1}>
+          <Grid item xs={2} sm={2} md={1}>
             <StyledLabel>Product Sales</StyledLabel>
             <TextField
               id="filled-hidden-label-small"
@@ -122,7 +166,7 @@ const UpdateProduct = function UpdateProduct() {
               size="small"
             />
           </Grid>
-          <Grid item xs={2} md={1}>
+          <Grid item xs={2} sm={2} md={1}>
             <StyledLabel>Low Stock</StyledLabel>
             <TextField
               id="filled-hidden-label-small"
@@ -139,7 +183,30 @@ const UpdateProduct = function UpdateProduct() {
             />
           </Grid>
 
-          <Grid item xs={9}>
+          <Grid item xs={9} sm={8} md={9} lg={10}>
+            {preferencesStore.preferences.showSlug && (
+              <>
+                {" "}
+                <StyledLabel>Slug</StyledLabel>
+                <TextField
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        {productStore.initialProduct.permalink.replace(
+                          productStore.initialProduct.slug + "/",
+                          ""
+                        )}
+                      </InputAdornment>
+                    ),
+                  }}
+                  fullWidth
+                  id="filled-hidden-label-small"
+                  value={productStore.productToBeUpdated.slug}
+                  onChange={(e) => handleInputChange("slug", e.target.value)}
+                  size="small"
+                />
+              </>
+            )}
             <StyledLabel>Name</StyledLabel>
             <TextField
               fullWidth
@@ -148,7 +215,6 @@ const UpdateProduct = function UpdateProduct() {
               onChange={(e) => handleInputChange("name", e.target.value)}
               size="small"
             />
-
             <StyledLabel>Description</StyledLabel>
             <TextareaAutosize
               aria-label="minimum height"
@@ -157,7 +223,6 @@ const UpdateProduct = function UpdateProduct() {
               onChange={(e) => handleInputChange("description", e.target.value)}
               style={{ width: "100%" }}
             />
-
             <StyledLabel>Short Description</StyledLabel>
             <TextareaAutosize
               aria-label="minimum height"
@@ -197,7 +262,7 @@ const UpdateProduct = function UpdateProduct() {
             )} */}
           </Grid>
 
-          <Grid item xs={3}>
+          <Grid item xs={12} sm={4} md={3} lg={2}>
             <Grid
               container
               spacing={{ xs: 2, md: 3 }}
@@ -317,13 +382,3 @@ const UpdateProduct = function UpdateProduct() {
 };
 
 export default observer(UpdateProduct);
-
-/* type : "simple"
-status : "publish"
-on_sale : false
-manage_stock : true
-stock_quantity : 3
-sale_price
-regular_price
-total_sales : 0
-low_stock_amount : null */

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import BottomNavigation from "@mui/material/BottomNavigation";
@@ -9,7 +9,7 @@ interface BottomNavProps {
 }
 
 export default function FixedBottomNavigation({ buttons }: BottomNavProps) {
-  const ref = React.useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   return (
     <Box sx={{ pb: 7 }} ref={ref}>
@@ -26,7 +26,6 @@ export default function FixedBottomNavigation({ buttons }: BottomNavProps) {
       >
         <BottomNavigation sx={{ pb: 2, padding: 1, background: "#d8e3ed" }}>
           {buttons}
-          {/* <BottomNavigationAction label="Button" icon={button} /> */}
         </BottomNavigation>
       </Paper>
     </Box>

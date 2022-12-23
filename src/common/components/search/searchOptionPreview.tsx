@@ -6,7 +6,8 @@ interface Props {
   props: any;
   view: string;
   option: any;
-  searchBy: string;
+  // searchBy: string;
+  searchBy: { key: string; name: string };
 }
 
 const SearchOptionPreview = function SearchOptionPreview({
@@ -30,7 +31,8 @@ const SearchOptionPreview = function SearchOptionPreview({
             srcSet={option.images[0].src ? option.images[0].src : null}
             alt={option.name}
           />
-          {searchBy}: {option.sku} - Name: {option.name}
+          <strong> {searchProductsType ? "Sku" : searchBy.name}: </strong>{" "}
+          {option.sku} - <strong> Name: </strong> {option.name}
         </Box>
       );
     } else {

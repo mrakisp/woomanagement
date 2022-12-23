@@ -40,6 +40,21 @@ class productStore {
     });
   }
 
+  deleteProduct() {
+    this.loading = true;
+    const productData = this.productToBeUpdated;
+
+    axios({
+      method: "delete",
+      url: productsEndPoint + productData.id + "?" + token,
+      data: { force: true },
+    }).then((response) => {
+      this.resetLoading();
+      this.initialProduct = {};
+      this.productToBeUpdated = {};
+    });
+  }
+
   setSelectedUpdateProduct(data: {} | any) {
     this.productToBeUpdated = data;
     this.dataToBeUpdated.categories = data.categories;

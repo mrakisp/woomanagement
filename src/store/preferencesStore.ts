@@ -5,6 +5,7 @@ class preferencesStore {
   preferences = {
     showWeight: true,
     showFeatured: true,
+    showSlug: true,
   };
 
   constructor() {
