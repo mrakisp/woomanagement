@@ -42,6 +42,7 @@ class searchStore {
     if (this.products.length > 0) {
       this.selectedProduct = this.products[0];
       productStore.setSelectedUpdateProduct(this.products[0]);
+      productStore.isProductChanged = false;
     } else {
       console.log("Not Selected Product");
     }

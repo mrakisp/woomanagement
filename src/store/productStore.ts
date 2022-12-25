@@ -58,6 +58,7 @@ class productStore {
   setSelectedUpdateProduct(data: {} | any) {
     this.productToBeUpdated = data;
     this.dataToBeUpdated.categories = data.categories;
+    this.dataToBeUpdated.attributes = data.attributes;
   }
 
   resetToDefaultProduct() {
@@ -105,6 +106,52 @@ class productStore {
       );
     }
 
+    this.isProductChanged = true;
+  }
+
+  updateAttributes(isChecked: boolean, attributes: any) {
+    let attrindex = this.productToBeUpdated.attributes.findIndex(
+      (attr: { id: any }) => attr.id === attributes.attributeId
+    );
+    if (isChecked) {
+      if (attrindex > -1) {
+        this.productToBeUpdated.attributes[attrindex].options = [
+          ...this.productToBeUpdated.attributes[attrindex].options,
+          attributes.option,
+        ];
+        this.dataToBeUpdated.attributes[attrindex].options = [
+          ...this.dataToBeUpdated.attributes[attrindex].options,
+          attributes.option,
+        ];
+      } else {
+        this.productToBeUpdated.attributes.push({
+          id: attributes.attributeId,
+          options: [attributes.option],
+        });
+      }
+    } else {
+      this.productToBeUpdated.attributes[attrindex].options = filter(
+        this.productToBeUpdated.attributes[attrindex].options,
+        function (x) {
+          return x !== attributes.option;
+        }
+      );
+      this.dataToBeUpdated.attributes[attrindex].options = filter(
+        this.productToBeUpdated.attributes[attrindex].options,
+        function (x) {
+          return x !== attributes.option;
+        }
+      );
+    }
+    this.isProductChanged = true;
+  }
+
+  updateAttributeVisibility(isChecked: boolean, id: string | number) {
+    let attrindex = this.productToBeUpdated.attributes.findIndex(
+      (attr: { id: any }) => attr.id === id
+    );
+    this.productToBeUpdated.attributes[attrindex].visible = isChecked;
+    this.dataToBeUpdated.attributes[attrindex].visible = isChecked;
     this.isProductChanged = true;
   }
 

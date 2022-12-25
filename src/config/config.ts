@@ -13,3 +13,5 @@ export const productsEndPoint =
   process.env.REACT_APP_WEBSITE + "/wp-json/wc/v3/products/";
 export const categoriesEndPoint =
   process.env.REACT_APP_WEBSITE + "/wp-json/wc/v3/products/categories/";
+export const attributesEndPoint =
+  process.env.REACT_APP_WEBSITE + "/wp-json/wc/v3/products/attributes/";

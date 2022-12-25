@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import productStore from "../store/productStore";
+// import productTempSavedValuesStore from "../store/productTempSavedValuesStore";
 import preferencesStore from "../store/preferencesStore";
 import ProductCategories from "../common/components/productCategories";
+import ProductAttributes from "../common/components/productAttributes";
 import SearchInput from "../common/components/search/searchInput";
 import { observer } from "mobx-react-lite";
 import { isEmpty } from "lodash";
@@ -64,6 +66,20 @@ const UpdateProduct = function UpdateProduct() {
     productStore.updateCategories(isChecked.target.checked, data);
   };
 
+  const handleAttributes = (
+    isChecked: React.ChangeEvent<HTMLInputElement>,
+    data: {}
+  ) => {
+    productStore.updateAttributes(isChecked.target.checked, data);
+  };
+
+  const handleAttributeVisibility = (
+    isChecked: React.ChangeEvent<HTMLInputElement>,
+    id: string | number
+  ) => {
+    productStore.updateAttributeVisibility(isChecked.target.checked, id);
+  };
+
   const isValidInput = (propName: string, value: number | string | boolean) => {
     if (
       propName === "sale_price" &&
@@ -104,7 +120,7 @@ const UpdateProduct = function UpdateProduct() {
       isLoading={productStore.loading}
       onClick={handleSave}
       disabled={!productStore.isProductChanged}
-      text="Save"
+      text="save"
       key="button4"
       icon={<SaveIcon />}
       sx={{ marginLeft: 5 }}
@@ -116,6 +132,7 @@ const UpdateProduct = function UpdateProduct() {
       container
       spacing={{ xs: 2, md: 3 }}
       columns={{ xs: 4, sm: 8, md: 12 }}
+      sx={{ paddingBottom: "100px;" }}
     >
       <Grid item xs={9}>
         <Grid
@@ -244,6 +261,12 @@ const UpdateProduct = function UpdateProduct() {
                 />
               </>
             )}
+            <StyledLabel>Attributes</StyledLabel>
+            <ProductAttributes
+              selectedAttributes={productStore.productToBeUpdated.attributes}
+              handleAttributes={handleAttributes}
+              handleAttributeVisibility={handleAttributeVisibility}
+            />
             {/* {preferencesStore.preferences.showFeatured && (
               <>
                 <StyledLabel>Featured</StyledLabel>
