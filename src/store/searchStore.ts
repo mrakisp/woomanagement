@@ -38,10 +38,11 @@ class searchStore {
     this.resetLoading();
   }
 
-  setSelectedProduct() {
+  setSelectedProduct(selectedProduct: any) {
     if (this.products.length > 0) {
-      this.selectedProduct = this.products[0];
-      productStore.setSelectedUpdateProduct(this.products[0]);
+      this.selectedProduct = selectedProduct; //this.products[0];
+      productStore.setSelectedUpdateProduct(selectedProduct);
+      // productStore.setSelectedUpdateProduct(this.products[0]);
       productStore.isProductChanged = false;
     } else {
       console.log("Not Selected Product");

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-// import { toJS } from "mobx";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -42,7 +41,7 @@ const SearchInput = function SearchInput({
   const handleSelectedValue = (newValue: Product | null) => {
     if (newValue) {
       if (searchType === searchProductsType) {
-        searchStore.setSelectedProduct();
+        searchStore.setSelectedProduct(newValue);
       }
     }
   };

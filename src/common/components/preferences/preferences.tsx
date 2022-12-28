@@ -4,10 +4,36 @@ import BasicModal from "../modal";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import Switch from "@mui/material/Switch";
 import preferencesStore from "../../../store/preferencesStore";
+import styled from "styled-components";
 
 interface PreferencesProps {
   visible?: boolean;
 }
+
+const Settings = styled.div`
+  margin-left: auto;
+  margin-top: 10px;
+  margin-right: 25px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  & span{
+    font-size: 12px;
+  }
+}
+`;
+
+const ModalContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  & span.title {
+      min-width: 110px;
+      display: inline-flex;
+  }
+}
+`;
 
 export default function Preferences({ visible }: PreferencesProps) {
   const [open, setOpen] = useState(false);
@@ -31,20 +57,24 @@ export default function Preferences({ visible }: PreferencesProps) {
 
   const Preferences = () => {
     return (
-      <>
-        Show Weight{" "}
-        <Switch
-          value="showWeight"
-          onChange={handleChange}
-          checked={JSON.parse(JSON.stringify(preferences)).showWeight}
-        />
-        Show Slug{" "}
-        <Switch
-          value="showSlug"
-          onChange={handleChange}
-          checked={JSON.parse(JSON.stringify(preferences)).showSlug}
-        />
-      </>
+      <ModalContainer>
+        <div>
+          <span className="title">Show Weight </span>
+          <Switch
+            value="showWeight"
+            onChange={handleChange}
+            checked={JSON.parse(JSON.stringify(preferences)).showWeight}
+          />
+        </div>
+        <div>
+          <span className="title">Show Slug </span>
+          <Switch
+            value="showSlug"
+            onChange={handleChange}
+            checked={JSON.parse(JSON.stringify(preferences)).showSlug}
+          />
+        </div>
+      </ModalContainer>
     );
   };
 
@@ -52,7 +82,11 @@ export default function Preferences({ visible }: PreferencesProps) {
     <>
       {visible && (
         <>
-          <SettingsIcon onClick={handleOpen} />
+          <Settings>
+            <SettingsIcon onClick={handleOpen} />
+            <span>Show/Hide Fields</span>
+          </Settings>
+
           <BasicModal
             component={<Preferences />}
             open={open}
