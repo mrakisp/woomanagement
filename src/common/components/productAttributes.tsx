@@ -5,6 +5,7 @@ import productTempSavedValuesStore from "../../store/productTempSavedValuesStore
 import { observer } from "mobx-react-lite";
 import Checkbox from "@mui/material/Checkbox";
 import TextField from "@mui/material/TextField";
+import SaveIcon from "@mui/icons-material/Save";
 import CachedIcon from "@mui/icons-material/Cached";
 import ContentPasteGoIcon from "@mui/icons-material/ContentPasteGo";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -12,6 +13,7 @@ import Alert from "@mui/material/Alert";
 import Button from "./button";
 import styled from "styled-components";
 
+//Styled internal components
 const AttributeRow = styled.div`
   box-shadow: 0px 0px 10px 10px #eee;
   padding: 0 20px;
@@ -37,6 +39,8 @@ const AttributeLabel = styled.div`
   padding: 10px 0 5px 10px;
   & span {
     font-weight: 400;
+    display: flex;
+    flex-direction: column;
   }
 `;
 
@@ -51,6 +55,8 @@ const AttributeList = styled.div`
 interface ProductAttributesProps {
   handleAttributes: (isChecked: any, data: {}) => void;
   handleAttributeVisibility: (isChecked: any, id: string | number) => void;
+  handleAttributeIsForVariation: (isChecked: any, id: string | number) => void;
+  handleUpdateVariations: (isChecked: any, id: string | number) => void;
   selectedAttributes: [
     {
       id: number;
@@ -67,6 +73,8 @@ const ProductAttributes = function ProductAttributes({
   selectedAttributes,
   handleAttributes,
   handleAttributeVisibility,
+  handleAttributeIsForVariation,
+  handleUpdateVariations,
 }: ProductAttributesProps) {
   const [fetchedAttributes] = useLocalStorage<string>(
     "attributes",
@@ -75,6 +83,7 @@ const ProductAttributes = function ProductAttributes({
   );
   const [searchAttribute, setSearchAttribute] = useState<string>("");
   const [isSynchMessageVisible, setSsSynchMessageVisible] = useState(false);
+  const [showWarningOnPaste, setShowWarningOnPaste] = useState(false);
 
   let attributesTerms: any = [];
   selectedAttributes?.forEach((row) => {
@@ -107,13 +116,25 @@ const ProductAttributes = function ProductAttributes({
   };
 
   const getSavedAttributes = () => {
+    productTempSavedValuesStore.getTempSaveAttributes();
     let savedattributesTerms: any = [];
     productTempSavedValuesStore.tempSavedAttributes?.forEach((row) => {
       row?.options?.forEach((term: any) => {
         savedattributesTerms.push(term);
       });
     });
-    productTempSavedValuesStore.getTempSaveAttributes();
+
+    if (
+      !productTempSavedValuesStore.tempSavedAttributes ||
+      productTempSavedValuesStore.tempSavedAttributes.length <= 0
+    ) {
+      setShowWarningOnPaste(true);
+      setTimeout(() => {
+        setShowWarningOnPaste(false);
+      }, 1500);
+    } else {
+      setShowWarningOnPaste(false);
+    }
   };
 
   useEffect(() => {
@@ -126,14 +147,6 @@ const ProductAttributes = function ProductAttributes({
     }
   }, [fetchedAttributes]);
 
-  // useEffect(() => {
-  //   if (!attributesStore.loading) {
-  //     setTimeout(() => {
-  //       setSsSynchMessageVisible(false);
-  //     }, 1500);
-  //   }
-  // }, [attributesStore.loading]);
-
   return (
     <div style={{ marginTop: "15px" }}>
       <TextField
@@ -141,7 +154,12 @@ const ProductAttributes = function ProductAttributes({
         variant="outlined"
         size="small"
         onChange={(e) => handleSearch(e)}
-        sx={{ position: "sticky", top: "0" }}
+        sx={{
+          position: "sticky",
+          top: "10px",
+          zIndex: "2",
+          backgroundColor: "#fff",
+        }}
       />
       <Button
         onClick={reSyncAttributes}
@@ -163,12 +181,12 @@ const ProductAttributes = function ProductAttributes({
         size="small"
         icon={<ContentPasteGoIcon />}
         sx={{ marginLeft: "25px" }}
-        disabled={
-          productTempSavedValuesStore.tempSavedAttributes &&
-          productTempSavedValuesStore.tempSavedAttributes.length > 0
-            ? false
-            : true
-        }
+        // disabled={
+        //   productTempSavedValuesStore.tempSavedAttributes &&
+        //   productTempSavedValuesStore.tempSavedAttributes.length > 0
+        //     ? false
+        //     : true
+        // }
       />
       <Alert
         variant="filled"
@@ -180,52 +198,96 @@ const ProductAttributes = function ProductAttributes({
       >
         Attributes Updated
       </Alert>
-      {attributesStore.productAttributes.map((attribute, index) => (
-        <AttributeRow key={index}>
-          <AttributeLabel
-            key={attribute.id}
-            style={{ display: "flex", alignItems: "center" }}
-          >
-            {attribute.name}{" "}
-            <Checkbox
-              sx={{ marginLeft: "auto" }}
-              key={"visible" + attribute.id}
-              checked={
-                selectedAttributes.find(
-                  (element) => element.id === attribute.id
-                )?.visible
-              }
-              onClick={(e) => handleAttributeVisibility(e, attribute.id)}
-            />
-            <span>Visible on the product page</span>
-          </AttributeLabel>
-          <AttributeList>
-            {attribute.options.map((option) => (
-              <AttributeItem
-                key={option}
-                hidden={
-                  searchAttribute !== "" &&
-                  !option.includes(searchAttribute) &&
-                  !attributesTerms.includes(option)
+      <Alert
+        variant="filled"
+        severity="warning"
+        sx={{
+          width: "50%",
+          display: showWarningOnPaste ? "flex" : "none",
+        }}
+      >
+        There is no coppied attributes
+      </Alert>
+      <>
+        {attributesStore.productAttributes.map((attribute, index) => (
+          <AttributeRow key={index}>
+            <AttributeLabel
+              key={attribute.id}
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              {attribute.name}{" "}
+              <Checkbox
+                sx={{ marginLeft: "auto" }}
+                key={"visible" + attribute.id}
+                checked={
+                  selectedAttributes.find(
+                    (element) => element.id === attribute.id
+                  )?.visible
                 }
+                onClick={(e) => handleAttributeVisibility(e, attribute.id)}
+              />
+              <span
+                style={{
+                  borderRight: "1px solid",
+                  paddingRight: "20px",
+                  marginRight: "10px",
+                }}
               >
-                <Checkbox
-                  key={"checkbox" + option}
-                  sx={{ padding: "0 5px" }}
-                  checked={attributesTerms.includes(option) ? true : false}
-                  onClick={(e) =>
-                    handleAttributes(e, {
-                      option: option,
-                      attributeId: attribute.id,
-                    })
+                Visible on the product page
+              </span>
+              <Checkbox
+                key={"variationEnabled" + attribute.id}
+                checked={
+                  selectedAttributes.find(
+                    (element) => element.id === attribute.id
+                  )?.variation
+                }
+                onClick={(e) => handleAttributeIsForVariation(e, attribute.id)}
+              />
+              <span>
+                Used for variations{" "}
+                <span style={{ fontSize: "12px", textTransform: "inherit" }}>
+                  (Save attributes to apply variations)
+                </span>
+              </span>
+            </AttributeLabel>
+            <AttributeList>
+              {attribute.options.map((option) => (
+                <AttributeItem
+                  key={option}
+                  hidden={
+                    searchAttribute !== "" &&
+                    !option.includes(searchAttribute) &&
+                    !attributesTerms.includes(option)
                   }
-                />
-                {option}
-              </AttributeItem>
-            ))}
-          </AttributeList>
-        </AttributeRow>
-      ))}
+                >
+                  <Checkbox
+                    key={"checkbox" + option}
+                    sx={{ padding: "0 5px" }}
+                    checked={attributesTerms.includes(option) ? true : false}
+                    onClick={(e) =>
+                      handleAttributes(e, {
+                        option: option,
+                        attributeId: attribute.id,
+                      })
+                    }
+                  />
+                  {option}
+                </AttributeItem>
+              ))}
+            </AttributeList>
+          </AttributeRow>
+        ))}
+        {selectedAttributes.find((element) => element.variation) && (
+          <Button
+            onClick={handleUpdateVariations}
+            text="Save Attributes"
+            size="medium"
+            icon={<SaveIcon />}
+            sx={{ marginLeft: "auto", display: "flex", marginTop: "20px" }}
+          />
+        )}
+      </>
     </div>
   );
 };

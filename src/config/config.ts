@@ -3,6 +3,8 @@ export const logInCredentials = {
   password: process.env.REACT_APP_PASSWORD,
 };
 
+export const amountSymbol = "€";
+
 export const token =
   "consumer_key=" +
   process.env.REACT_APP_CONSUMER_KEY +

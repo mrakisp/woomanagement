@@ -1,7 +1,8 @@
 import { makeAutoObservable } from "mobx";
 import axios from "axios";
 import { productsEndPoint, token } from "../config/config";
-import { filter } from "lodash";
+import { filter, uniq } from "lodash";
+import variationsStore from "./variationsStore";
 
 class productStore {
   productToBeUpdated: any | null = {};
@@ -10,6 +11,7 @@ class productStore {
   selectedCategories: any = [];
   initialProduct: any | null = {};
   dataToBeUpdated: any = {};
+  attributesToBeUpdated: any;
 
   constructor() {
     makeAutoObservable(this);
@@ -55,12 +57,14 @@ class productStore {
     });
   }
 
+  //called when user select product from search
   setSelectedUpdateProduct(data: {} | any) {
     this.productToBeUpdated = data;
     this.dataToBeUpdated.categories = data.categories;
     this.dataToBeUpdated.attributes = data.attributes;
   }
 
+  //reset
   resetToDefaultProduct() {
     for (var k in this.productToBeUpdated)
       this.productToBeUpdated[k] = this.initialProduct[k];
@@ -72,6 +76,7 @@ class productStore {
     this.initialProduct = data;
   }
 
+  //update values in product object on user selection
   updateValueOfProduct(
     propertyToBeUpdated: string,
     value: string | number | boolean
@@ -81,6 +86,7 @@ class productStore {
     this.isProductChanged = true;
   }
 
+  //update selected categories on user selection
   updateCategories(isChecked: boolean, categories: any) {
     if (isChecked) {
       this.productToBeUpdated.categories = [
@@ -109,6 +115,7 @@ class productStore {
     this.isProductChanged = true;
   }
 
+  //update attributes on user selection
   updateAttributes(isChecked: boolean, attributes: any) {
     let attrindex = this.productToBeUpdated.attributes.findIndex(
       (attr: { id: any }) => attr.id === attributes.attributeId
@@ -143,9 +150,13 @@ class productStore {
         }
       );
     }
+    this.dataToBeUpdated.attributes[attrindex].options = uniq(
+      this.dataToBeUpdated.attributes[attrindex].options
+    );
     this.isProductChanged = true;
   }
 
+  //update attribute visibility
   updateAttributeVisibility(isChecked: boolean, id: string | number) {
     let attrindex = this.productToBeUpdated.attributes.findIndex(
       (attr: { id: any }) => attr.id === id
@@ -153,6 +164,96 @@ class productStore {
     this.productToBeUpdated.attributes[attrindex].visible = isChecked;
     this.dataToBeUpdated.attributes[attrindex].visible = isChecked;
     this.isProductChanged = true;
+  }
+
+  // Used for variations in variations panel
+  updateAttributeVariation(isChecked: boolean, id: string | number) {
+    let attrindex = this.productToBeUpdated.attributes.findIndex(
+      (attr: { id: any }) => attr.id === id
+    );
+
+    this.productToBeUpdated.attributes.forEach(
+      (attr: { variation: boolean }) => {
+        attr.variation = false;
+      }
+    );
+    this.productToBeUpdated.attributes[attrindex].variation = isChecked;
+    this.dataToBeUpdated.attributes[attrindex].variation = isChecked;
+    this.isProductChanged = true;
+    this.attributesToBeUpdated = this.productToBeUpdated.attributes;
+
+    this.updateVariationsFromAttributes();
+  }
+
+  // save button in attributes panel
+  saveAttributeVariation() {
+    this.attributesToBeUpdated = this.productToBeUpdated.attributes;
+
+    if (
+      this.productToBeUpdated.attributes.find(
+        (element: any) => element.variation
+      )
+    ) {
+      this.updateVariationsFromAttributes();
+    }
+  }
+
+  // invoke service - save attributes used for variations internally
+  updateVariationsFromAttributes() {
+    variationsStore.loading = true;
+    const productData = this.productToBeUpdated;
+
+    axios({
+      method: "put",
+      url: productsEndPoint + productData.id + "?" + token,
+      data: { attributes: this.attributesToBeUpdated },
+    }).then((response) => {
+      // this.productToBeUpdated = response.data;
+      // this.dataToBeUpdated = response.data;
+      // todo
+      this.productToBeUpdated.attributes = response.data.attributes;
+      this.productToBeUpdated.variations = response.data.variations;
+      this.dataToBeUpdated.attributes = response.data.attributes;
+      this.dataToBeUpdated.variations = response.data.variations;
+
+      this.createProductVariations();
+    });
+  }
+
+  // invoke service - create and save variations based on selected attributes
+  createProductVariations() {
+    const index = this.productToBeUpdated.attributes.findIndex(
+      (attr: { variation: boolean }) => attr.variation === true
+    );
+
+    // this.loading = true;
+    const productData = this.productToBeUpdated;
+    const createVariations = this.productToBeUpdated.attributes[index]
+      ? this.productToBeUpdated.attributes[index].options
+      : [];
+    const selectedAttributeId = this.productToBeUpdated.attributes[index]?.id;
+
+    let createVariTerms: any = [];
+
+    createVariations.forEach((element: any, index: number) => {
+      createVariTerms.push({
+        attributes: [{ id: selectedAttributeId, option: element }],
+      });
+    });
+
+    const data = {
+      create: createVariTerms,
+      delete: this.productToBeUpdated.variations,
+    };
+
+    axios({
+      method: "post",
+      url: productsEndPoint + productData.id + "/variations/batch?" + token,
+      data,
+    }).then((response) => {
+      variationsStore.getProductVariations(productData.id);
+      // variationsStore.loading = false;
+    });
   }
 
   resetLoading() {
