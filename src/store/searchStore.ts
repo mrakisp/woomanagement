@@ -26,7 +26,7 @@ class searchStore {
     }).then((response) => {
       if (response && response.data && response.data.length > 0) {
         this.setSearchProductResults(response.data);
-        this.setInitalRetrievedProduct(response.data[0]);
+        this.setInitalRetrievedProduct(response.data);
       } else {
         this.resetLoading();
       }
@@ -49,8 +49,8 @@ class searchStore {
     }
   }
 
-  setInitalRetrievedProduct(data: {}) {
-    productStore.setInitialProduct(data);
+  setInitalRetrievedProduct(data: any[]) {
+    productStore.setInitialProduct(data[0]);
   }
 
   /* END PRODUCTS */

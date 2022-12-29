@@ -8,7 +8,7 @@ interface Attributes {
   name: string;
   position?: number;
   visible?: boolean;
-  variation?: boolean;
+  variation: boolean;
   options: any[];
   slug?: string;
 }
@@ -37,13 +37,13 @@ class productAttributesStore {
     }).then((response) => {
       if (response && response.data && response.data.length > 0) {
         this.loading = false;
-
         response.data.forEach((attribute: Attributes) => {
           this.getProductAttributesTerms(attribute.id);
           attributesData.push({
             name: attribute.name,
             id: attribute.id,
             options: [],
+            variation: false,
           });
         });
 

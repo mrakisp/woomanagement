@@ -6,6 +6,8 @@ class productVariationsStore {
   productVariations: any[] = [];
   loading = false;
   variationChanged = false;
+  initialProductVariations: any[] = [];
+  loadingSave = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -23,6 +25,7 @@ class productVariationsStore {
           element.sku = element.sku + "-" + element.attributes[0]?.option;
         });
       }
+
       this.setProductVariation(response.data);
       this.loading = false;
     });
@@ -33,6 +36,7 @@ class productVariationsStore {
       return a.id - b.id || a.name.localeCompare(b.name);
     });
     this.productVariations = data;
+    this.initialProductVariations = data;
   }
 
   updateValueOfProduct(
@@ -48,6 +52,7 @@ class productVariationsStore {
   }
 
   saveVariations(productId: number) {
+    this.loadingSave = true;
     let updateVariationTerms: any = [];
 
     this.productVariations.forEach((element: any, index: number) => {
@@ -73,9 +78,23 @@ class productVariationsStore {
       data,
     }).then((response) => {
       this.variationChanged = false;
+
+      response.data.update.sort(function (a: any, b: any) {
+        return a.id - b.id || a.name.localeCompare(b.name);
+      });
+      // this.initialProductVariations = response.data.update;
+      this.loadingSave = false;
       // this.setProductVariation(response.data);
       // variationsStore.loading = false;
     });
+  }
+
+  copyValues(property: string) {
+    const valueToBePaste = this.productVariations[0][property];
+    this.productVariations.forEach((element: any, index: number) => {
+      element[property] = valueToBePaste;
+    });
+    this.variationChanged = true;
   }
 }
 

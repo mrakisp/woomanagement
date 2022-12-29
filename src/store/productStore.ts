@@ -1,7 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import axios from "axios";
 import { productsEndPoint, token } from "../config/config";
-import { filter, uniq } from "lodash";
+import { filter, uniq, isEqual } from "lodash";
 import variationsStore from "./variationsStore";
 
 class productStore {
@@ -12,6 +12,7 @@ class productStore {
   initialProduct: any | null = {};
   dataToBeUpdated: any = {};
   attributesToBeUpdated: any;
+  attributesWarning = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -29,17 +30,29 @@ class productStore {
   }
 
   updateProduct() {
+    this.attributesWarning = false;
     this.loading = true;
     const productData = this.productToBeUpdated;
 
-    axios({
-      method: "put",
-      url: productsEndPoint + productData.id + "?" + token,
-      data: this.dataToBeUpdated,
-    }).then((response) => {
-      this.resetLoading();
-      this.initialProduct = response.data;
-    });
+    if (
+      this.productToBeUpdated.type === "variable" &&
+      !isEqual(
+        this.productToBeUpdated.attributes,
+        this.initialProduct.attributes
+      )
+    ) {
+      this.attributesWarning = true;
+      this.loading = false;
+    } else {
+      axios({
+        method: "put",
+        url: productsEndPoint + productData.id + "?" + token,
+        data: this.dataToBeUpdated,
+      }).then((response) => {
+        this.resetLoading();
+        this.initialProduct = response.data;
+      });
+    }
   }
 
   deleteProduct() {
@@ -150,10 +163,17 @@ class productStore {
         }
       );
     }
-    this.dataToBeUpdated.attributes[attrindex].options = uniq(
+    if (
+      this.dataToBeUpdated.attributes[attrindex] &&
       this.dataToBeUpdated.attributes[attrindex].options
-    );
-    this.isProductChanged = true;
+    )
+      this.dataToBeUpdated.attributes[attrindex].options = uniq(
+        this.dataToBeUpdated.attributes[attrindex]?.options
+      );
+
+    if (this.productToBeUpdated.type !== "variable") {
+      this.isProductChanged = true;
+    }
   }
 
   //update attribute visibility
@@ -172,17 +192,36 @@ class productStore {
       (attr: { id: any }) => attr.id === id
     );
 
-    this.productToBeUpdated.attributes.forEach(
-      (attr: { variation: boolean }) => {
-        attr.variation = false;
-      }
-    );
-    this.productToBeUpdated.attributes[attrindex].variation = isChecked;
-    this.dataToBeUpdated.attributes[attrindex].variation = isChecked;
-    this.isProductChanged = true;
-    this.attributesToBeUpdated = this.productToBeUpdated.attributes;
+    if (attrindex >= 0) {
+      this.productToBeUpdated.attributes.forEach(
+        (attr: { id: string | number; variation: boolean }) => {
+          if (attr.id === id) {
+            attr.variation = true;
+          } else {
+            attr.variation = false;
+          }
+        }
+      );
+      //this.isProductChanged = true;
+      this.attributesToBeUpdated = this.productToBeUpdated.attributes;
+    }
 
-    this.updateVariationsFromAttributes();
+    // this.productToBeUpdated.attributes.find(
+    //   (element: any) => element.id === id
+    // ).variation = true;
+    // this.dataToBeUpdated.attributes.find(
+    //   (element: any) => element.id === id
+    // ).variation = true;
+
+    //if (attrindex > -1) {
+    // this.productToBeUpdated.attributes[attrindex].variation = isChecked;
+    // this.dataToBeUpdated.attributes[attrindex].variation = isChecked;
+    //}
+
+    // this.isProductChanged = true;
+    // this.attributesToBeUpdated = this.productToBeUpdated.attributes;
+
+    // this.updateVariationsFromAttributes();
   }
 
   // save button in attributes panel
@@ -194,12 +233,12 @@ class productStore {
         (element: any) => element.variation
       )
     ) {
-      this.updateVariationsFromAttributes();
+      this.updateAttributesWithVariations();
     }
   }
 
   // invoke service - save attributes used for variations internally
-  updateVariationsFromAttributes() {
+  updateAttributesWithVariations() {
     variationsStore.loading = true;
     const productData = this.productToBeUpdated;
 
@@ -208,25 +247,23 @@ class productStore {
       url: productsEndPoint + productData.id + "?" + token,
       data: { attributes: this.attributesToBeUpdated },
     }).then((response) => {
-      // this.productToBeUpdated = response.data;
-      // this.dataToBeUpdated = response.data;
-      // todo
       this.productToBeUpdated.attributes = response.data.attributes;
-      this.productToBeUpdated.variations = response.data.variations;
+      // this.productToBeUpdated.variations = response.data.variations;
       this.dataToBeUpdated.attributes = response.data.attributes;
-      this.dataToBeUpdated.variations = response.data.variations;
+      // this.dataToBeUpdated.variations = response.data.variations;
+      this.initialProduct.attributes = response.data.attributes;
+      // this.initialProduct.variations = response.data.variations;
 
-      this.createProductVariations();
+      this.createUpdateProductVariations();
     });
   }
 
   // invoke service - create and save variations based on selected attributes
-  createProductVariations() {
+  createUpdateProductVariations() {
     const index = this.productToBeUpdated.attributes.findIndex(
       (attr: { variation: boolean }) => attr.variation === true
     );
 
-    // this.loading = true;
     const productData = this.productToBeUpdated;
     const createVariations = this.productToBeUpdated.attributes[index]
       ? this.productToBeUpdated.attributes[index].options
@@ -251,7 +288,17 @@ class productStore {
       url: productsEndPoint + productData.id + "/variations/batch?" + token,
       data,
     }).then((response) => {
-      variationsStore.getProductVariations(productData.id);
+      if (response && response.data && response.data.create?.length > 0) {
+        response.data.create.forEach((element: any) => {
+          element.sku = element.sku + "-" + element.attributes[0]?.option;
+        });
+        variationsStore.setProductVariation(response.data.create);
+      } else {
+        variationsStore.setProductVariation([]);
+      }
+      variationsStore.variationChanged = true;
+      variationsStore.loading = false;
+      // variationsStore.getProductVariations(productData.id);
       // variationsStore.loading = false;
     });
   }

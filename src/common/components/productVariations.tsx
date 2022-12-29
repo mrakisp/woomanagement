@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import productVariations from "../../store/variationsStore";
 import { observer } from "mobx-react-lite";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import SaveIcon from "@mui/icons-material/Save";
-import Alert from "@mui/material/Alert";
+import ContentPasteGoIcon from "@mui/icons-material/ContentPasteGo";
 import Button from "./button";
 import styled, { keyframes } from "styled-components";
 import { amountSymbol } from "../../config/config";
 import Loading from "./loading";
 
 interface ProductVariationsProps {
-  // handleVariations: (isChecked: any, data: {}) => void;
   selectedAttributes: [];
   productId: number;
 }
@@ -37,6 +36,9 @@ const VariationContainer = styled.div`
   }
   & > div span {
     align-self: flex-start;
+    display: flex;
+    position: relative;
+    width: 100%;
   }
 `;
 
@@ -66,8 +68,6 @@ const AnimatedComponent = styled.div`
 const ProductVariations = function ProductVariations({
   productId,
 }: ProductVariationsProps) {
-  const [variationsSaved, setVariationsSaved] = useState(false);
-
   const handleInputChange = (
     variationId: number,
     propertyToBeUpdated: string,
@@ -99,12 +99,13 @@ const ProductVariations = function ProductVariations({
   };
 
   const handleSaveVariations = () => {
-    setVariationsSaved(true);
+    // setVariationsSaved(true);
     productVariations.saveVariations(productId);
-    setTimeout(() => {
-      setVariationsSaved(false);
-    }, 3500);
+    // setTimeout(() => {
+    //   setVariationsSaved(false);
+    // }, 3500);
   };
+
   useEffect(() => {
     productVariations.getProductVariations(productId);
   }, [productId]);
@@ -115,7 +116,7 @@ const ProductVariations = function ProductVariations({
         <Loading />
       ) : (
         productVariations.productVariations.map(
-          (variation) =>
+          (variation, index) =>
             variation.attributes[0] && (
               <VariationRow key={variation.id}>
                 <VariationLabel>
@@ -134,7 +135,31 @@ const ProductVariations = function ProductVariations({
                     />
                   </div>
                   <div>
-                    <span>Regular Price</span>
+                    <span>
+                      Regular Price{" "}
+                      {index === 0 &&
+                        productVariations.productVariations.length !== 1 && (
+                          <div
+                            style={{
+                              display: "flex",
+                              position: "absolute",
+                              right: "0",
+                            }}
+                          >
+                            <ContentPasteGoIcon
+                              sx={{
+                                width: "18px",
+                                fill: "#1976d2",
+                                cursor: "pointer",
+                              }}
+                              onClick={() =>
+                                productVariations.copyValues("regular_price")
+                              }
+                            />
+                          </div>
+                        )}
+                    </span>
+
                     <TextField
                       value={variation?.regular_price}
                       onChange={(e) =>
@@ -157,7 +182,30 @@ const ProductVariations = function ProductVariations({
                     />
                   </div>
                   <div>
-                    <span>Sale Price</span>
+                    <span>
+                      Sale Price
+                      {index === 0 &&
+                        productVariations.productVariations.length !== 1 && (
+                          <div
+                            style={{
+                              display: "flex",
+                              position: "absolute",
+                              right: "0",
+                            }}
+                          >
+                            <ContentPasteGoIcon
+                              sx={{
+                                width: "18px",
+                                fill: "#1976d2",
+                                cursor: "pointer",
+                              }}
+                              onClick={() =>
+                                productVariations.copyValues("sale_price")
+                              }
+                            />
+                          </div>
+                        )}
+                    </span>
                     <TextField
                       value={variation?.sale_price}
                       onChange={(e) =>
@@ -180,7 +228,30 @@ const ProductVariations = function ProductVariations({
                     />
                   </div>
                   <div>
-                    <span>Stock Quantity</span>
+                    <span>
+                      Stock Quantity
+                      {index === 0 &&
+                        productVariations.productVariations.length !== 1 && (
+                          <div
+                            style={{
+                              display: "flex",
+                              position: "absolute",
+                              right: "0",
+                            }}
+                          >
+                            <ContentPasteGoIcon
+                              sx={{
+                                width: "18px",
+                                fill: "#1976d2",
+                                cursor: "pointer",
+                              }}
+                              onClick={() =>
+                                productVariations.copyValues("stock_quantity")
+                              }
+                            />
+                          </div>
+                        )}
+                    </span>
                     <TextField
                       value={variation?.stock_quantity}
                       onChange={(e) =>
@@ -198,7 +269,30 @@ const ProductVariations = function ProductVariations({
                     />
                   </div>
                   <div>
-                    <span>Weight</span>
+                    <span>
+                      Weight
+                      {index === 0 &&
+                        productVariations.productVariations.length !== 1 && (
+                          <div
+                            style={{
+                              display: "flex",
+                              position: "absolute",
+                              right: "0",
+                            }}
+                          >
+                            <ContentPasteGoIcon
+                              sx={{
+                                width: "18px",
+                                fill: "#1976d2",
+                                cursor: "pointer",
+                              }}
+                              onClick={() =>
+                                productVariations.copyValues("weight")
+                              }
+                            />
+                          </div>
+                        )}
+                    </span>
                     <TextField
                       value={variation?.weight}
                       onChange={(e) =>
@@ -232,6 +326,7 @@ const ProductVariations = function ProductVariations({
               display: "flex",
               marginTop: "20px",
             }}
+            isLoading={productVariations.loadingSave}
           />
         </AnimatedComponent>
       ) : (
@@ -246,17 +341,20 @@ const ProductVariations = function ProductVariations({
               display: "flex",
               marginTop: "20px",
             }}
+            isLoading={productVariations.loadingSave}
           />
-          <Alert
-            variant="filled"
-            severity="success"
-            sx={{
-              width: "100%",
-              display: variationsSaved ? "flex" : "none",
-            }}
-          >
-            Variations Saved
-          </Alert>
+          {/* {!productVariations.loadingSave && (
+            <Alert
+              variant="filled"
+              severity="success"
+              sx={{
+                width: "100%",
+                // display: variationsSaved ? "flex" : "none",
+              }}
+            >
+              Variations Saved
+            </Alert>
+          )} */}
         </>
       )}
     </div>

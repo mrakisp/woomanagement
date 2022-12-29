@@ -13,6 +13,7 @@ import {
   searchBySearch,
 } from "../common/components/search/searchTypes";
 import Button from "../common/components/button";
+import BasicModal from "../common/components/modal";
 import FixedBottom from "../common/components/fixedBottomContainer";
 import { StyledLabel } from "../common/components/styledComponents";
 import TextField from "@mui/material/TextField";
@@ -24,14 +25,18 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import Switch from "@mui/material/Switch";
 import PreviewIcon from "@mui/icons-material/Preview";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Alert from "@mui/material/Alert";
 
 const UpdateProduct = function UpdateProduct() {
   const [isSearchBySku, setIsSearchBySku] = useState(true);
-  // const [isSearchBySku, setIsSearchBySku] = useState(true);
 
   useEffect(() => {
     preferencesStore.getPreferences();
   }, []);
+
+  const handleCloseAttributeWarning = () => {
+    productStore.attributesWarning = false;
+  };
 
   const handleSave = () => {
     if (productStore.isProductChanged) {
@@ -74,13 +79,6 @@ const UpdateProduct = function UpdateProduct() {
     productStore.updateAttributes(isChecked.target.checked, data);
   };
 
-  // const handleVariations = (
-  //   isChecked: React.ChangeEvent<HTMLInputElement>,
-  //   data: {}
-  // ) => {
-  //   console.log("variations");
-  // };
-
   const handleAttributeVisibility = (
     isChecked: React.ChangeEvent<HTMLInputElement>,
     id: string | number
@@ -95,7 +93,7 @@ const UpdateProduct = function UpdateProduct() {
     productStore.updateAttributeVariation(isChecked.target.checked, id);
   };
 
-  const handleUpdateVariations = () => {
+  const handleUpdateAttributesForVariations = () => {
     productStore.saveAttributeVariation();
   };
 
@@ -183,7 +181,7 @@ const UpdateProduct = function UpdateProduct() {
       {!isEmpty(productStore.productToBeUpdated) ? (
         <>
           <Grid item xs={2} sm={2} md={1}>
-            <StyledLabel>Product Id</StyledLabel>
+            <StyledLabel>Id</StyledLabel>
             <TextField
               id="filled-hidden-label-small"
               defaultValue={productStore.productToBeUpdated.id}
@@ -193,7 +191,7 @@ const UpdateProduct = function UpdateProduct() {
             />
           </Grid>
           <Grid item xs={2} sm={2} md={1}>
-            <StyledLabel>Product Sales</StyledLabel>
+            <StyledLabel>Sales</StyledLabel>
             <TextField
               id="filled-hidden-label-small"
               defaultValue={productStore.productToBeUpdated.total_sales}
@@ -275,31 +273,37 @@ const UpdateProduct = function UpdateProduct() {
               handleAttributes={handleAttributes}
               handleAttributeVisibility={handleAttributeVisibility}
               handleAttributeIsForVariation={handleAttributeIsForVariation}
-              handleUpdateVariations={handleUpdateVariations}
+              handleUpdateAttributesForVariations={
+                handleUpdateAttributesForVariations
+              }
             />
-            <StyledLabel>Variations</StyledLabel>
-            {productStore.productToBeUpdated.variations &&
-            productStore.productToBeUpdated.variations.length > 0 ? (
+            {productStore.productToBeUpdated.type === "variable" && (
               <>
-                <ProductVariations
-                  selectedAttributes={
-                    productStore.productToBeUpdated.attributes
-                  }
-                  // handleVariations={handleVariations}
-                  productId={productStore.productToBeUpdated.id}
-                />
+                <StyledLabel>Variations</StyledLabel>
+                {productStore.productToBeUpdated.variations &&
+                productStore.productToBeUpdated.variations.length > 0 ? (
+                  <>
+                    <ProductVariations
+                      selectedAttributes={
+                        productStore.productToBeUpdated.attributes
+                      }
+                      // handleVariations={handleVariations}
+                      productId={productStore.productToBeUpdated.id}
+                    />
+                  </>
+                ) : (
+                  <div
+                    style={{
+                      minHeight: "100px",
+                      alignItems: "center",
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    There is no selected attribute to be used for Variations.
+                  </div>
+                )}
               </>
-            ) : (
-              <div
-                style={{
-                  minHeight: "100px",
-                  alignItems: "center",
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                There is no selected attribute to be used for Variations.
-              </div>
             )}
           </Grid>
 
@@ -338,93 +342,96 @@ const UpdateProduct = function UpdateProduct() {
                 />
               </Grid>
             </Grid>
-
-            <Grid
-              container
-              spacing={{ xs: 2, md: 3 }}
-              columns={{ xs: 4, sm: 8, md: 12 }}
-            >
-              <Grid item xs={6}>
-                <StyledLabel>Price</StyledLabel>
-                <TextField
-                  id="filled-hidden-label-small"
-                  value={productStore.productToBeUpdated.regular_price}
-                  onChange={(e) =>
-                    handleInputChange("regular_price", e.target.value)
-                  }
-                  size="small"
-                  InputProps={{
-                    inputProps: { min: 0 },
-                    endAdornment: (
-                      <InputAdornment position="end">€</InputAdornment>
-                    ),
-                  }}
-                  type="number"
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <StyledLabel>Sale Price</StyledLabel>
-                <TextField
-                  id="filled-hidden-label-small"
-                  value={productStore.productToBeUpdated.sale_price}
-                  onChange={(e) =>
-                    handleInputChange("sale_price", e.target.value)
-                  }
-                  size="small"
-                  InputProps={{
-                    inputProps: {
-                      min: 0,
-                    },
-                    endAdornment: (
-                      <InputAdornment position="end">€</InputAdornment>
-                    ),
-                  }}
-                  type="number"
-                />
-              </Grid>
-            </Grid>
-            <Grid
-              container
-              spacing={{ xs: 2, md: 3 }}
-              columns={{ xs: 4, sm: 8, md: 12 }}
-            >
-              <Grid item xs={6}>
-                {productStore.productToBeUpdated.manage_stock && (
-                  <>
-                    <StyledLabel>Stock Quantity</StyledLabel>
+            {productStore.productToBeUpdated.type !== "variable" && (
+              <>
+                <Grid
+                  container
+                  spacing={{ xs: 2, md: 3 }}
+                  columns={{ xs: 4, sm: 8, md: 12 }}
+                >
+                  <Grid item xs={6}>
+                    <StyledLabel>Price</StyledLabel>
                     <TextField
-                      value={productStore.productToBeUpdated.stock_quantity}
+                      id="filled-hidden-label-small"
+                      value={productStore.productToBeUpdated.regular_price}
                       onChange={(e) =>
-                        handleInputChange(
-                          "stock_quantity",
-                          parseInt(e.target.value)
-                        )
+                        handleInputChange("regular_price", e.target.value)
                       }
                       size="small"
                       InputProps={{
                         inputProps: { min: 0 },
+                        endAdornment: (
+                          <InputAdornment position="end">€</InputAdornment>
+                        ),
                       }}
                       type="number"
                     />
-                  </>
-                )}
-              </Grid>
-              <Grid item xs={6}>
-                {preferencesStore.preferences.showWeight && (
-                  <>
-                    <StyledLabel>Weight</StyledLabel>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <StyledLabel>Sale Price</StyledLabel>
                     <TextField
-                      value={productStore.productToBeUpdated.weight}
+                      id="filled-hidden-label-small"
+                      value={productStore.productToBeUpdated.sale_price}
                       onChange={(e) =>
-                        handleInputChange("weight", e.target.value)
+                        handleInputChange("sale_price", e.target.value)
                       }
                       size="small"
+                      InputProps={{
+                        inputProps: {
+                          min: 0,
+                        },
+                        endAdornment: (
+                          <InputAdornment position="end">€</InputAdornment>
+                        ),
+                      }}
+                      type="number"
                     />
-                  </>
-                )}
-              </Grid>
-            </Grid>
+                  </Grid>
+                </Grid>
 
+                <Grid
+                  container
+                  spacing={{ xs: 2, md: 3 }}
+                  columns={{ xs: 4, sm: 8, md: 12 }}
+                >
+                  <Grid item xs={6}>
+                    {productStore.productToBeUpdated.manage_stock && (
+                      <>
+                        <StyledLabel>Stock Quantity</StyledLabel>
+                        <TextField
+                          value={productStore.productToBeUpdated.stock_quantity}
+                          onChange={(e) =>
+                            handleInputChange(
+                              "stock_quantity",
+                              parseInt(e.target.value)
+                            )
+                          }
+                          size="small"
+                          InputProps={{
+                            inputProps: { min: 0 },
+                          }}
+                          type="number"
+                        />
+                      </>
+                    )}
+                  </Grid>
+                  <Grid item xs={6}>
+                    {preferencesStore.preferences.showWeight && (
+                      <>
+                        <StyledLabel>Weight</StyledLabel>
+                        <TextField
+                          value={productStore.productToBeUpdated.weight}
+                          onChange={(e) =>
+                            handleInputChange("weight", e.target.value)
+                          }
+                          size="small"
+                        />
+                      </>
+                    )}
+                  </Grid>
+                </Grid>
+              </>
+            )}
             <StyledLabel>Product Categories</StyledLabel>
             <ProductCategories
               handleCategories={handleCategories}
@@ -438,6 +445,16 @@ const UpdateProduct = function UpdateProduct() {
             />
           </Grid>
           <FixedBottom buttons={FixedFooterbuttons} />
+
+          <BasicModal
+            component={
+              <Alert severity="error">
+                Changes detected in attributes. Please save attributes!
+              </Alert>
+            }
+            open={productStore.attributesWarning}
+            handleClose={handleCloseAttributeWarning}
+          />
         </>
       ) : null}
     </Grid>
