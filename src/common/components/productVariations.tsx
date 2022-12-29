@@ -127,7 +127,7 @@ const ProductVariations = function ProductVariations({
                   <div>
                     <span>Sku</span>
                     <TextField
-                      value={variation?.sku}
+                      value={variation.sku}
                       onChange={(e) =>
                         handleInputChange(variation.id, "sku", e.target.value)
                       }
@@ -161,7 +161,7 @@ const ProductVariations = function ProductVariations({
                     </span>
 
                     <TextField
-                      value={variation?.regular_price}
+                      value={variation.regular_price}
                       onChange={(e) =>
                         handleInputChange(
                           variation.id,
@@ -207,7 +207,7 @@ const ProductVariations = function ProductVariations({
                         )}
                     </span>
                     <TextField
-                      value={variation?.sale_price}
+                      value={variation.sale_price}
                       onChange={(e) =>
                         handleInputChange(
                           variation.id,
@@ -253,7 +253,7 @@ const ProductVariations = function ProductVariations({
                         )}
                     </span>
                     <TextField
-                      value={variation?.stock_quantity}
+                      value={variation.stock_quantity}
                       onChange={(e) =>
                         handleInputChange(
                           variation.id,
@@ -294,7 +294,7 @@ const ProductVariations = function ProductVariations({
                         )}
                     </span>
                     <TextField
-                      value={variation?.weight}
+                      value={variation.weight}
                       onChange={(e) =>
                         handleInputChange(
                           variation.id,

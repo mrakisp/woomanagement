@@ -23,7 +23,9 @@ import TextareaAutosize from "@mui/base/TextareaAutosize";
 import Grid from "@mui/material/Grid";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
+import InfoIcon from "@mui/icons-material/Info";
 import Switch from "@mui/material/Switch";
+import Tooltip from "@mui/material/Tooltip";
 import PreviewIcon from "@mui/icons-material/Preview";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Alert from "@mui/material/Alert";
@@ -34,6 +36,7 @@ interface ProductProps {
 
 const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
   const [isSearchBySku, setIsSearchBySku] = useState(true);
+  const [isSkuFilled, setIsSkuFilled] = useState(false);
 
   useEffect(() => {
     preferencesStore.getPreferences();
@@ -56,6 +59,7 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
   };
 
   const handleSave = () => {
+    //validation todo name sku,price,saleprice,name
     if (viewState === "create" && !productStore.productToBeUpdated.id) {
       productStore.createProduct();
     } else if (productStore.isProductChanged) {
@@ -65,6 +69,7 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
 
   const handleCancel = () => {
     productStore.resetToDefaultProduct(viewState);
+    setIsSkuFilled(false);
   };
 
   const handleInputChange = (
@@ -117,10 +122,15 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
   };
 
   const handleUpdateAttributesForVariations = () => {
-    if (viewState === "create" && !productStore.productToBeUpdated.id) {
-      productStore.createTempProduct();
+    if (!productStore.productToBeUpdated.sku) {
+      setIsSkuFilled(true);
+      document.documentElement.scrollTop = 0;
     } else {
-      productStore.saveAttributeVariation();
+      if (viewState === "create" && !productStore.productToBeUpdated.id) {
+        productStore.createTempProduct();
+      } else {
+        productStore.saveAttributeVariation();
+      }
     }
   };
 
@@ -284,7 +294,6 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
             />
             <StyledLabel>Description</StyledLabel>
             <TextareaAutosize
-              aria-label="minimum height"
               minRows={10}
               value={productStore.productToBeUpdated.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
@@ -292,7 +301,6 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
             />
             <StyledLabel>Short Description</StyledLabel>
             <TextareaAutosize
-              aria-label="minimum height"
               minRows={5}
               value={productStore.productToBeUpdated.short_description}
               onChange={(e) =>
@@ -352,11 +360,12 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
               columns={{ xs: 4, sm: 8, md: 12 }}
             >
               <Grid item xs={6}>
-                <StyledLabel>Sku</StyledLabel>
+                <StyledLabel>Sku*</StyledLabel>
                 <TextField
                   value={productStore.productToBeUpdated.sku}
                   onChange={(e) => handleInputChange("sku", e.target.value)}
                   size="small"
+                  error={isSkuFilled}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -388,95 +397,183 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
                 />
               </Grid>
             </Grid>
-            {productStore.productToBeUpdated.type !== "variable" && (
-              <>
-                <Grid
-                  container
-                  spacing={{ xs: 2, md: 3 }}
-                  columns={{ xs: 4, sm: 8, md: 12 }}
-                >
-                  <Grid item xs={6}>
-                    <StyledLabel>Price</StyledLabel>
+            {/* {productStore.productToBeUpdated.type !== "variable" && ( */}
+            {/* <> */}
+            <Grid
+              container
+              spacing={{ xs: 2, md: 3 }}
+              columns={{ xs: 4, sm: 8, md: 12 }}
+            >
+              <Grid item xs={6}>
+                <StyledLabel>
+                  Price
+                  <Tooltip title="Price will be used only for simple product. If you use variations, variations price will be applied">
+                    <InfoIcon
+                      sx={{
+                        marginLeft: "auto",
+                        display: "flex",
+                        cursor: "pointer",
+                      }}
+                    />
+                  </Tooltip>
+                </StyledLabel>
+                <TextField
+                  disabled={productStore.productToBeUpdated.type === "variable"}
+                  variant={
+                    productStore.productToBeUpdated.type === "variable"
+                      ? "filled"
+                      : undefined
+                  }
+                  value={
+                    productStore.productToBeUpdated.type === "variable"
+                      ? null
+                      : productStore.productToBeUpdated.regular_price
+                  }
+                  onChange={(e) =>
+                    handleInputChange("regular_price", e.target.value)
+                  }
+                  size="small"
+                  InputProps={{
+                    inputProps: { min: 0 },
+                    endAdornment: (
+                      <InputAdornment position="end">€</InputAdornment>
+                    ),
+                  }}
+                  type="number"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <StyledLabel>
+                  Sale Price
+                  <Tooltip title="Sale Price will be used only for simple product. If you use variations, variations sale price will be applied">
+                    <InfoIcon
+                      sx={{
+                        marginLeft: "auto",
+                        display: "flex",
+                        cursor: "pointer",
+                      }}
+                    />
+                  </Tooltip>
+                </StyledLabel>
+                <TextField
+                  disabled={productStore.productToBeUpdated.type === "variable"}
+                  value={
+                    productStore.productToBeUpdated.type === "variable"
+                      ? null
+                      : productStore.productToBeUpdated.sale_price
+                  }
+                  onChange={(e) =>
+                    handleInputChange("sale_price", e.target.value)
+                  }
+                  variant={
+                    productStore.productToBeUpdated.type === "variable"
+                      ? "filled"
+                      : undefined
+                  }
+                  size="small"
+                  InputProps={{
+                    inputProps: {
+                      min: 0,
+                    },
+                    endAdornment: (
+                      <InputAdornment position="end">€</InputAdornment>
+                    ),
+                  }}
+                  type="number"
+                />
+              </Grid>
+            </Grid>
+
+            <Grid
+              container
+              spacing={{ xs: 2, md: 3 }}
+              columns={{ xs: 4, sm: 8, md: 12 }}
+            >
+              <Grid item xs={6}>
+                {(productStore.productToBeUpdated.manage_stock ||
+                  viewState === "create") && (
+                  <>
+                    <StyledLabel>
+                      Stock Quantity
+                      <Tooltip title="Stock will be used only for simple product. If you use variations, variations stock will be applied">
+                        <InfoIcon
+                          sx={{
+                            marginLeft: "auto",
+                            display: "flex",
+                            cursor: "pointer",
+                          }}
+                        />
+                      </Tooltip>
+                    </StyledLabel>
                     <TextField
-                      value={productStore.productToBeUpdated.regular_price}
+                      value={
+                        productStore.productToBeUpdated.type === "variable"
+                          ? null
+                          : productStore.productToBeUpdated.stock_quantity
+                      }
                       onChange={(e) =>
-                        handleInputChange("regular_price", e.target.value)
+                        handleInputChange(
+                          "stock_quantity",
+                          parseInt(e.target.value)
+                        )
+                      }
+                      disabled={
+                        productStore.productToBeUpdated.type === "variable"
+                      }
+                      variant={
+                        productStore.productToBeUpdated.type === "variable"
+                          ? "filled"
+                          : undefined
                       }
                       size="small"
                       InputProps={{
                         inputProps: { min: 0 },
-                        endAdornment: (
-                          <InputAdornment position="end">€</InputAdornment>
-                        ),
                       }}
                       type="number"
                     />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <StyledLabel>Sale Price</StyledLabel>
+                  </>
+                )}
+              </Grid>
+              <Grid item xs={6}>
+                {preferencesStore.preferences.showWeight && (
+                  <>
+                    <StyledLabel>
+                      Weight{" "}
+                      <Tooltip title="Weight will be used only for simple product. If you use variations, variations weight will be applied">
+                        <InfoIcon
+                          sx={{
+                            marginLeft: "auto",
+                            display: "flex",
+                            cursor: "pointer",
+                          }}
+                        />
+                      </Tooltip>
+                    </StyledLabel>
                     <TextField
-                      value={productStore.productToBeUpdated.sale_price}
+                      variant={
+                        productStore.productToBeUpdated.type === "variable"
+                          ? "filled"
+                          : undefined
+                      }
+                      disabled={
+                        productStore.productToBeUpdated.type === "variable"
+                      }
+                      value={
+                        productStore.productToBeUpdated.type === "variable"
+                          ? null
+                          : productStore.productToBeUpdated.weight
+                      }
                       onChange={(e) =>
-                        handleInputChange("sale_price", e.target.value)
+                        handleInputChange("weight", e.target.value)
                       }
                       size="small"
-                      InputProps={{
-                        inputProps: {
-                          min: 0,
-                        },
-                        endAdornment: (
-                          <InputAdornment position="end">€</InputAdornment>
-                        ),
-                      }}
-                      type="number"
                     />
-                  </Grid>
-                </Grid>
-
-                <Grid
-                  container
-                  spacing={{ xs: 2, md: 3 }}
-                  columns={{ xs: 4, sm: 8, md: 12 }}
-                >
-                  <Grid item xs={6}>
-                    {(productStore.productToBeUpdated.manage_stock ||
-                      viewState === "create") && (
-                      <>
-                        <StyledLabel>Stock Quantity</StyledLabel>
-                        <TextField
-                          value={productStore.productToBeUpdated.stock_quantity}
-                          onChange={(e) =>
-                            handleInputChange(
-                              "stock_quantity",
-                              parseInt(e.target.value)
-                            )
-                          }
-                          size="small"
-                          InputProps={{
-                            inputProps: { min: 0 },
-                          }}
-                          type="number"
-                        />
-                      </>
-                    )}
-                  </Grid>
-                  <Grid item xs={6}>
-                    {preferencesStore.preferences.showWeight && (
-                      <>
-                        <StyledLabel>Weight</StyledLabel>
-                        <TextField
-                          value={productStore.productToBeUpdated.weight}
-                          onChange={(e) =>
-                            handleInputChange("weight", e.target.value)
-                          }
-                          size="small"
-                        />
-                      </>
-                    )}
-                  </Grid>
-                </Grid>
-              </>
-            )}
+                  </>
+                )}
+              </Grid>
+            </Grid>
+            {/* </> */}
+            {/* )} */}
             <StyledLabel>Product Categories</StyledLabel>
             <ProductCategories
               handleCategories={handleCategories}

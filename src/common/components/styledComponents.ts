@@ -9,6 +9,7 @@ export const StyledLabel = styled.div`
   font-size: 14px;
   text-transform: uppercase;
   text-align: left;
+  display: flex;
 `;
 
 export const ActionButton = styled.button`

@@ -86,6 +86,7 @@ class productStore {
         (element: any) => element.variation
       )
     ) {
+      this.loading = true;
       this.productToBeUpdated.type = "variable"; //set variable automaticaly
       this.productToBeUpdated.manage_stock = false; //set general manage_stock automaticaly
       this.productToBeUpdated.status = "draft"; //set to draft until final save by user
@@ -476,6 +477,7 @@ class productStore {
       }
       variationsStore.variationChanged = true;
       variationsStore.loading = false;
+      this.loading = false;
     });
   }
 
