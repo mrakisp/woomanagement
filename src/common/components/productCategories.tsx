@@ -109,7 +109,7 @@ const ProductCategories = function ProductCategories({
             >
               <Checkbox
                 key={category.id}
-                checked={currentCategories.some(
+                checked={currentCategories?.some(
                   (element: any) => element.id === category.id
                 )}
                 onClick={(e) =>
@@ -134,7 +134,7 @@ const ProductCategories = function ProductCategories({
                 >
                   <Checkbox
                     key={category.id}
-                    checked={currentCategories.some(
+                    checked={currentCategories?.some(
                       (element: any) => element.id === category.id
                     )}
                     onClick={(e) =>
@@ -158,7 +158,7 @@ const ProductCategories = function ProductCategories({
                   >
                     <Checkbox
                       key={category.id}
-                      checked={currentCategories.some(
+                      checked={currentCategories?.some(
                         (element: any) => element.id === category.id
                       )}
                       onClick={(e) =>

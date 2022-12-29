@@ -4,6 +4,7 @@ import preferencesStore from "../store/preferencesStore";
 import ProductCategories from "../common/components/productCategories";
 import ProductAttributes from "../common/components/productAttributes";
 import ProductVariations from "../common/components/productVariations";
+import Loading from "../common/components/loading";
 import SearchInput from "../common/components/search/searchInput";
 import { observer } from "mobx-react-lite";
 import { isEmpty } from "lodash";
@@ -27,25 +28,43 @@ import PreviewIcon from "@mui/icons-material/Preview";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Alert from "@mui/material/Alert";
 
-const UpdateProduct = function UpdateProduct() {
+interface ProductProps {
+  viewState: string;
+}
+
+const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
   const [isSearchBySku, setIsSearchBySku] = useState(true);
 
   useEffect(() => {
     preferencesStore.getPreferences();
   }, []);
 
+  useEffect(() => {
+    if (viewState === "create") {
+      productStore.setCreateProductModel();
+    } else {
+      productStore.productToBeUpdated = {};
+    }
+  }, [viewState]);
+
   const handleCloseAttributeWarning = () => {
     productStore.attributesWarning = false;
   };
 
+  const handleCloseSavedMessage = () => {
+    productStore.productsaved = false;
+  };
+
   const handleSave = () => {
-    if (productStore.isProductChanged) {
-      productStore.updateProduct();
+    if (viewState === "create" && !productStore.productToBeUpdated.id) {
+      productStore.createProduct();
+    } else if (productStore.isProductChanged) {
+      productStore.updateProduct(viewState);
     }
   };
 
   const handleCancel = () => {
-    productStore.resetToDefaultProduct();
+    productStore.resetToDefaultProduct(viewState);
   };
 
   const handleInputChange = (
@@ -90,11 +109,19 @@ const UpdateProduct = function UpdateProduct() {
     isChecked: React.ChangeEvent<HTMLInputElement>,
     id: string | number
   ) => {
-    productStore.updateAttributeVariation(isChecked.target.checked, id);
+    productStore.updateAttributeVariation(
+      isChecked.target.checked,
+      id,
+      viewState
+    );
   };
 
   const handleUpdateAttributesForVariations = () => {
-    productStore.saveAttributeVariation();
+    if (viewState === "create" && !productStore.productToBeUpdated.id) {
+      productStore.createTempProduct();
+    } else {
+      productStore.saveAttributeVariation();
+    }
   };
 
   const isValidInput = (propName: string, value: number | string | boolean) => {
@@ -108,22 +135,26 @@ const UpdateProduct = function UpdateProduct() {
   };
 
   const FixedFooterbuttons = [
-    <Button
-      onClick={handleDelete}
-      text="Delete Product"
-      key="button1"
-      size="small"
-      color="error"
-      icon={<DeleteIcon />}
-      sx={{ marginRight: "auto" }}
-    />,
+    viewState === "update" && (
+      <Button
+        onClick={handleDelete}
+        text="Delete Product"
+        key="button1"
+        size="small"
+        color="error"
+        icon={<DeleteIcon />}
+        sx={{ marginRight: "auto" }}
+      />
+    ),
+    viewState === "update" && (
+      <Button
+        onClick={handlePreview}
+        text="View Product"
+        key="button2"
+        icon={<PreviewIcon />}
+      />
+    ),
 
-    <Button
-      onClick={handlePreview}
-      text="View Product"
-      key="button2"
-      icon={<PreviewIcon />}
-    />,
     <Button
       onClick={handleCancel}
       disabled={!productStore.isProductChanged}
@@ -151,90 +182,93 @@ const UpdateProduct = function UpdateProduct() {
       columns={{ xs: 4, sm: 8, md: 12 }}
       sx={{ paddingBottom: "100px;" }}
     >
-      <Grid item xs={9}>
-        <Grid
-          container
-          spacing={{ xs: 2, md: 3 }}
-          columns={{ xs: 4, sm: 8, md: 12 }}
-        >
-          <Grid item xs={6} md={4}>
-            {isSearchBySku ? (
-              <SearchInput
-                searchType={searchProductsType}
-                searchBy={searchBySku}
-              />
-            ) : (
-              <SearchInput
-                searchType={searchProductsType}
-                searchBy={searchBySearch}
-              />
-            )}
-          </Grid>
-          <Grid item xs={3}>
-            Change Search
-            <br />
-            <Switch onChange={(e) => setIsSearchBySku(!isSearchBySku)} />
+      {viewState === "update" && (
+        <Grid item xs={9}>
+          <Grid
+            container
+            spacing={{ xs: 2, md: 3 }}
+            columns={{ xs: 4, sm: 8, md: 12 }}
+          >
+            <Grid item xs={6} md={4}>
+              {isSearchBySku ? (
+                <SearchInput
+                  searchType={searchProductsType}
+                  searchBy={searchBySku}
+                />
+              ) : (
+                <SearchInput
+                  searchType={searchProductsType}
+                  searchBy={searchBySearch}
+                />
+              )}
+            </Grid>
+            <Grid item xs={3}>
+              Change Search
+              <br />
+              <Switch onChange={(e) => setIsSearchBySku(!isSearchBySku)} />
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
-
-      {!isEmpty(productStore.productToBeUpdated) ? (
+      )}
+      {(viewState === "update" &&
+        !isEmpty(productStore.productToBeUpdated) &&
+        productStore.productToBeUpdated.id) ||
+      (viewState === "create" && !isEmpty(productStore.productToBeUpdated)) ? (
         <>
-          <Grid item xs={2} sm={2} md={1}>
-            <StyledLabel>Id</StyledLabel>
-            <TextField
-              id="filled-hidden-label-small"
-              defaultValue={productStore.productToBeUpdated.id}
-              disabled
-              variant="filled"
-              size="small"
-            />
-          </Grid>
-          <Grid item xs={2} sm={2} md={1}>
-            <StyledLabel>Sales</StyledLabel>
-            <TextField
-              id="filled-hidden-label-small"
-              defaultValue={productStore.productToBeUpdated.total_sales}
-              disabled
-              variant="filled"
-              size="small"
-            />
-          </Grid>
-          <Grid item xs={2} sm={2} md={1}>
-            <StyledLabel>Low Stock</StyledLabel>
-            <TextField
-              id="filled-hidden-label-small"
-              defaultValue={
-                productStore.productToBeUpdated.low_stock_amount &&
-                productStore.productToBeUpdated.low_stock_amount <=
-                  productStore.productToBeUpdated.stock_quantity
-                  ? "Yes"
-                  : "No"
-              }
-              disabled
-              variant="filled"
-              size="small"
-            />
-          </Grid>
-
+          {viewState === "update" && (
+            <>
+              <Grid item xs={2} sm={2} md={1}>
+                <StyledLabel>Id</StyledLabel>
+                <TextField
+                  defaultValue={productStore.productToBeUpdated.id}
+                  disabled
+                  variant="filled"
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={2} sm={2} md={1}>
+                <StyledLabel>Sales</StyledLabel>
+                <TextField
+                  defaultValue={productStore.productToBeUpdated.total_sales}
+                  disabled
+                  variant="filled"
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={2} sm={2} md={1}>
+                <StyledLabel>Low Stock</StyledLabel>
+                <TextField
+                  defaultValue={
+                    productStore.productToBeUpdated.low_stock_amount &&
+                    productStore.productToBeUpdated.low_stock_amount <=
+                      productStore.productToBeUpdated.stock_quantity
+                      ? "Yes"
+                      : "No"
+                  }
+                  disabled
+                  variant="filled"
+                  size="small"
+                />
+              </Grid>
+            </>
+          )}
           <Grid item xs={9} sm={8} md={9} lg={10}>
             {preferencesStore.preferences.showSlug && (
               <>
-                {" "}
                 <StyledLabel>Slug</StyledLabel>
                 <TextField
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        {productStore.initialProduct.permalink.replace(
-                          productStore.initialProduct.slug + "/",
-                          ""
-                        )}
+                        {viewState === "update" &&
+                          productStore.initialProduct.permalink.replace(
+                            productStore.initialProduct.slug + "/",
+                            ""
+                          )}
                       </InputAdornment>
                     ),
                   }}
                   fullWidth
-                  id="filled-hidden-label-small"
                   value={productStore.productToBeUpdated.slug}
                   onChange={(e) => handleInputChange("slug", e.target.value)}
                   size="small"
@@ -244,7 +278,6 @@ const UpdateProduct = function UpdateProduct() {
             <StyledLabel>Name</StyledLabel>
             <TextField
               fullWidth
-              id="filled-hidden-label-small"
               value={productStore.productToBeUpdated.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
               size="small"
@@ -276,6 +309,7 @@ const UpdateProduct = function UpdateProduct() {
               handleUpdateAttributesForVariations={
                 handleUpdateAttributesForVariations
               }
+              viewState={viewState}
             />
             {productStore.productToBeUpdated.type === "variable" && (
               <>
@@ -300,7 +334,11 @@ const UpdateProduct = function UpdateProduct() {
                       justifyContent: "center",
                     }}
                   >
-                    There is no selected attribute to be used for Variations.
+                    {productStore.autoCreateVariations ? (
+                      <Loading />
+                    ) : (
+                      "There is no selected attribute to be used for Variations."
+                    )}
                   </div>
                 )}
               </>
@@ -316,7 +354,6 @@ const UpdateProduct = function UpdateProduct() {
               <Grid item xs={6}>
                 <StyledLabel>Sku</StyledLabel>
                 <TextField
-                  id="filled-hidden-label-small"
                   value={productStore.productToBeUpdated.sku}
                   onChange={(e) => handleInputChange("sku", e.target.value)}
                   size="small"
@@ -325,7 +362,16 @@ const UpdateProduct = function UpdateProduct() {
               <Grid item xs={6}>
                 <StyledLabel>Status</StyledLabel>
                 <span style={{ textTransform: "capitalize" }}>
-                  {productStore.productToBeUpdated.status}
+                  <span
+                    style={{
+                      color:
+                        productStore.productToBeUpdated.status === "publish"
+                          ? "#239b78"
+                          : "#9b2323",
+                    }}
+                  >
+                    {productStore.productToBeUpdated.status}
+                  </span>
                 </span>
                 <Switch
                   value={
@@ -335,7 +381,7 @@ const UpdateProduct = function UpdateProduct() {
                   }
                   onChange={(e) => handleInputChange("status", e.target.value)}
                   checked={
-                    productStore.productToBeUpdated.status === "publish"
+                    productStore.userStatusSelection === "publish"
                       ? true
                       : false
                   }
@@ -352,7 +398,6 @@ const UpdateProduct = function UpdateProduct() {
                   <Grid item xs={6}>
                     <StyledLabel>Price</StyledLabel>
                     <TextField
-                      id="filled-hidden-label-small"
                       value={productStore.productToBeUpdated.regular_price}
                       onChange={(e) =>
                         handleInputChange("regular_price", e.target.value)
@@ -370,7 +415,6 @@ const UpdateProduct = function UpdateProduct() {
                   <Grid item xs={6}>
                     <StyledLabel>Sale Price</StyledLabel>
                     <TextField
-                      id="filled-hidden-label-small"
                       value={productStore.productToBeUpdated.sale_price}
                       onChange={(e) =>
                         handleInputChange("sale_price", e.target.value)
@@ -395,7 +439,8 @@ const UpdateProduct = function UpdateProduct() {
                   columns={{ xs: 4, sm: 8, md: 12 }}
                 >
                   <Grid item xs={6}>
-                    {productStore.productToBeUpdated.manage_stock && (
+                    {(productStore.productToBeUpdated.manage_stock ||
+                      viewState === "create") && (
                       <>
                         <StyledLabel>Stock Quantity</StyledLabel>
                         <TextField
@@ -438,11 +483,13 @@ const UpdateProduct = function UpdateProduct() {
               currentCategories={productStore.productToBeUpdated.categories}
             />
             <StyledLabel>Image</StyledLabel>
-            <img
-              width="250"
-              alt={productStore.productToBeUpdated.name}
-              src={productStore.productToBeUpdated.images[0].src}
-            />
+            {viewState === "update" && (
+              <img
+                width="250"
+                alt={productStore.productToBeUpdated.name}
+                src={productStore.productToBeUpdated.images[0]?.src}
+              />
+            )}
           </Grid>
           <FixedBottom buttons={FixedFooterbuttons} />
 
@@ -454,6 +501,11 @@ const UpdateProduct = function UpdateProduct() {
             }
             open={productStore.attributesWarning}
             handleClose={handleCloseAttributeWarning}
+          />
+          <BasicModal
+            component={<Alert severity="success">Product Saved</Alert>}
+            open={productStore.productsaved}
+            handleClose={handleCloseSavedMessage}
           />
         </>
       ) : null}

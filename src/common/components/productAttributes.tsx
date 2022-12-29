@@ -9,6 +9,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CachedIcon from "@mui/icons-material/Cached";
 import ContentPasteGoIcon from "@mui/icons-material/ContentPasteGo";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import Tooltip from "@mui/material/Tooltip";
 import Alert from "@mui/material/Alert";
 import Button from "./button";
 import styled from "styled-components";
@@ -71,6 +72,7 @@ interface ProductAttributesProps {
       options: any;
     }
   ];
+  viewState: string;
 }
 
 const ProductAttributes = function ProductAttributes({
@@ -79,6 +81,7 @@ const ProductAttributes = function ProductAttributes({
   handleAttributeVisibility,
   handleAttributeIsForVariation,
   handleUpdateAttributesForVariations,
+  viewState,
 }: ProductAttributesProps) {
   const [fetchedAttributes] = useLocalStorage<string>(
     "attributes",
@@ -95,6 +98,20 @@ const ProductAttributes = function ProductAttributes({
       attributesTerms.push(term);
     });
   });
+
+  let showButtonSaveAttr = false;
+  if (selectedAttributes?.find((element) => element.variation)) {
+    showButtonSaveAttr = true;
+  }
+
+  let showCheckForVariationsButton = false;
+  if (
+    viewState === "create" ||
+    (viewState === "update" &&
+      selectedAttributes?.find((element) => element.variation))
+  ) {
+    showCheckForVariationsButton = true;
+  }
 
   const handleSearch = (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -239,7 +256,7 @@ const ProductAttributes = function ProductAttributes({
                   sx={{ marginLeft: "auto" }}
                   key={"visible" + attribute.id}
                   checked={
-                    selectedAttributes.find(
+                    selectedAttributes?.find(
                       (element) => element.id === attribute.id
                     )?.visible
                       ? true
@@ -248,7 +265,8 @@ const ProductAttributes = function ProductAttributes({
                   onClick={(e) => handleAttributeVisibility(e, attribute.id)}
                 />
                 <span>Visible on the product page</span>
-                {selectedAttributes.find((element) => element.variation) && (
+                {/* {selectedAttributes?.find((element) => element.variation)  */}
+                {showCheckForVariationsButton && (
                   <>
                     <div
                       style={{
@@ -258,30 +276,39 @@ const ProductAttributes = function ProductAttributes({
                         height: "20px",
                       }}
                     ></div>
-                    <Checkbox
-                      key={"variationEnabled" + attribute.id}
-                      // disabled={
-                      //   selectedAttributes.find(
-                      //     (element) => element.id === attribute.id
-                      //   )
-                      //     ? false
-                      //     : true
-                      // }
-                      checked={
-                        selectedAttributes.find(
-                          (element) => element.id === attribute.id
-                        )?.variation
-                          ? true
-                          : false
-                      }
-                      onChange={(e) =>
-                        handleAttributeIsForVariation(e, attribute.id)
-                      }
-                    />
+                    <Tooltip
+                      title="Only one attribute can be selected to be used for Variations. If its selected 
+                    and click on save attributes it cannot be de-selected"
+                    >
+                      <Checkbox
+                        key={"variationEnabled" + attribute.id}
+                        // disabled={
+                        //   selectedAttributes.find(
+                        //     (element) => element.id === attribute.id
+                        //   )
+                        //     ? false
+                        //     : true
+                        // }
+                        checked={
+                          selectedAttributes?.find(
+                            (element) => element.id === attribute.id
+                          )?.variation
+                            ? true
+                            : false
+                        }
+                        onChange={(e) =>
+                          handleAttributeIsForVariation(e, attribute.id)
+                        }
+                      />
+                    </Tooltip>
+
                     <span>
-                      Used for variations{" "}
+                      Used for variations
                       <span
-                        style={{ fontSize: "12px", textTransform: "inherit" }}
+                        style={{
+                          fontSize: "12px",
+                          textTransform: "inherit",
+                        }}
                       >
                         (Save attributes to apply variations)
                       </span>
@@ -317,7 +344,7 @@ const ProductAttributes = function ProductAttributes({
             </AttributeRow>
           ))}
         </div>
-        {selectedAttributes.find((element) => element.variation) && (
+        {showButtonSaveAttr && (
           <Button
             onClick={handleUpdateAttributesForVariations}
             text="Save Attributes"

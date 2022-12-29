@@ -31,10 +31,11 @@ class productVariationsStore {
     });
   }
 
-  setProductVariation(data: any) {
+  setProductVariation(data: any, createView?: boolean) {
     data.sort(function (a: any, b: any) {
       return a.id - b.id || a.name.localeCompare(b.name);
     });
+
     this.productVariations = data;
     this.initialProductVariations = data;
   }
