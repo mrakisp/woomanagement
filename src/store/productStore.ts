@@ -73,6 +73,8 @@ class productStore {
   productsaved = false;
   autoCreateVariations = false; // for new product
   userStatusSelection: string = "publish";
+  notValidFields = [{}]; //[{field:"sku",isValid:false,field:"regular_price",isValid:false}]
+  notValidVariations = [{}];
 
   constructor() {
     makeAutoObservable(this);
@@ -163,6 +165,43 @@ class productStore {
         this.productToBeUpdated = {};
       }
     });
+  }
+
+  validateFields() {
+    this.notValidFields = [];
+    this.notValidVariations = [];
+    if (!this.productToBeUpdated.sku) {
+      this.notValidFields.push({ field: "sku" });
+    }
+    if (!this.productToBeUpdated.name) {
+      this.notValidFields.push({ field: "name" });
+    }
+
+    if (this.productToBeUpdated.type !== "variable") {
+      if (!this.productToBeUpdated.regular_price) {
+        this.notValidFields.push({ field: "regular_price" });
+      }
+    } else {
+      variationsStore.productVariations.forEach((element, index): void => {
+        if (!element.sku) {
+          this.notValidVariations.push({ field: "sku", index: index });
+        }
+        if (!element.regular_price) {
+          this.notValidVariations.push({
+            field: "regular_price",
+            index: index,
+          });
+        }
+      });
+    }
+    if (
+      this.notValidFields.length <= 0 &&
+      this.notValidVariations.length <= 0
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   resetCreateProduct(fromCancelButton?: boolean) {

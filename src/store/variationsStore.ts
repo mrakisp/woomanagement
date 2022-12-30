@@ -21,6 +21,7 @@ class productVariationsStore {
       url: productsEndPoint + productId + "/variations/?" + token,
     }).then((response) => {
       if (response && response.data && response.data.length > 0) {
+        //todo
         response.data.forEach((element: any) => {
           element.sku = element.sku + "-" + element.attributes[0]?.option;
         });

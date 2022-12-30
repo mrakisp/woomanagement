@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import CreateUpdateProductView from "../../views/createUpdateProductView";
-// import CreateProductView from "../../views/createProductView";
+// import ProductList from "../../views/productsListView";
 import DashboardView from "../../views/dashboardView";
 // import { toJS } from "mobx";
 import Tabs from "@mui/material/Tabs";
@@ -54,6 +54,7 @@ export default function CenteredTabs() {
         sx={{ bgcolor: "#d8e3ed" }}
       >
         <Tab label="Dashboard" />
+        {/* <Tab label="Product List" /> */}
         <Tab label="Create Product" />
         <Tab label="Update Product" />
         <Preferences visible={value === 1 || value === 2} />
@@ -61,6 +62,9 @@ export default function CenteredTabs() {
       <TabPanel value={value} index={0}>
         <DashboardView />
       </TabPanel>
+      {/* <TabPanel value={value} index={1}>
+        <ProductList />
+      </TabPanel> */}
       <TabPanel value={value} index={1}>
         <CreateUpdateProductView viewState={"create"} />
       </TabPanel>

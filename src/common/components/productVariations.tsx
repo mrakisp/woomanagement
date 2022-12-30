@@ -13,6 +13,7 @@ import Loading from "./loading";
 interface ProductVariationsProps {
   selectedAttributes: [];
   productId: number;
+  errors: any;
 }
 
 const VariationRow = styled.div`
@@ -67,12 +68,19 @@ const AnimatedComponent = styled.div`
 
 const ProductVariations = function ProductVariations({
   productId,
+  errors,
 }: ProductVariationsProps) {
   const handleInputChange = (
     variationId: number,
     propertyToBeUpdated: string,
-    value: string | number | boolean
+    value: string | number | boolean,
+    rowIndex?: string | number
   ) => {
+    const indexOfObject = errors.findIndex((object: any) => {
+      return object.field === propertyToBeUpdated && object.field === rowIndex;
+    });
+    errors.splice(indexOfObject, 1);
+
     let index = productVariations.productVariations.findIndex(
       (variation) => variation.id === variationId
     );
@@ -99,11 +107,7 @@ const ProductVariations = function ProductVariations({
   };
 
   const handleSaveVariations = () => {
-    // setVariationsSaved(true);
     productVariations.saveVariations(productId);
-    // setTimeout(() => {
-    //   setVariationsSaved(false);
-    // }, 3500);
   };
 
   useEffect(() => {
@@ -129,9 +133,22 @@ const ProductVariations = function ProductVariations({
                     <TextField
                       value={variation.sku}
                       onChange={(e) =>
-                        handleInputChange(variation.id, "sku", e.target.value)
+                        handleInputChange(
+                          variation.id,
+                          "sku",
+                          e.target.value,
+                          index
+                        )
                       }
                       size="small"
+                      error={
+                        errors.find(
+                          (element: any) =>
+                            element.field === "sku" && element.index === index
+                        )
+                          ? true
+                          : false
+                      }
                     />
                   </div>
                   <div>
@@ -166,7 +183,8 @@ const ProductVariations = function ProductVariations({
                         handleInputChange(
                           variation.id,
                           "regular_price",
-                          e.target.value
+                          e.target.value,
+                          index
                         )
                       }
                       size="small"
@@ -179,6 +197,15 @@ const ProductVariations = function ProductVariations({
                         ),
                       }}
                       type="number"
+                      error={
+                        errors.find(
+                          (element: any) =>
+                            element.field === "regular_price" &&
+                            element.index === index
+                        )
+                          ? true
+                          : false
+                      }
                     />
                   </div>
                   <div>

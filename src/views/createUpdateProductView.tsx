@@ -37,6 +37,7 @@ interface ProductProps {
 const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
   const [isSearchBySku, setIsSearchBySku] = useState(true);
   const [isSkuFilled, setIsSkuFilled] = useState(false);
+  const [isValidFields, setIsValidFields] = useState(false);
 
   useEffect(() => {
     preferencesStore.getPreferences();
@@ -58,12 +59,19 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
     productStore.productsaved = false;
   };
 
+  const handleCloseRequiredError = () => {
+    setIsValidFields(false);
+  };
+
   const handleSave = () => {
-    //validation todo name sku,price,saleprice,name
-    if (viewState === "create" && !productStore.productToBeUpdated.id) {
-      productStore.createProduct();
-    } else if (productStore.isProductChanged) {
-      productStore.updateProduct(viewState);
+    if (productStore.validateFields()) {
+      if (viewState === "create" && !productStore.productToBeUpdated.id) {
+        productStore.createProduct();
+      } else if (productStore.isProductChanged) {
+        productStore.updateProduct(viewState);
+      }
+    } else {
+      setIsValidFields(true);
     }
   };
 
@@ -76,6 +84,17 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
     propertyToBeUpdated: string,
     value: string | number | boolean
   ) => {
+    setIsSkuFilled(false);
+
+    //remove error
+    const indexOfObject = productStore.notValidFields.findIndex(
+      (object: any) => {
+        return object.field === propertyToBeUpdated;
+      }
+    );
+    productStore.notValidFields.splice(indexOfObject, 1);
+    //end remove error
+
     if (isValidInput(propertyToBeUpdated, value)) {
       productStore.updateValueOfProduct(propertyToBeUpdated, value);
     }
@@ -291,6 +310,13 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
               value={productStore.productToBeUpdated.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
               size="small"
+              error={
+                productStore.notValidFields.find(
+                  (element: any) => element.field === "name"
+                )
+                  ? true
+                  : false
+              }
             />
             <StyledLabel>Description</StyledLabel>
             <TextareaAutosize
@@ -329,7 +355,7 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
                       selectedAttributes={
                         productStore.productToBeUpdated.attributes
                       }
-                      // handleVariations={handleVariations}
+                      errors={productStore.notValidVariations}
                       productId={productStore.productToBeUpdated.id}
                     />
                   </>
@@ -360,12 +386,19 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
               columns={{ xs: 4, sm: 8, md: 12 }}
             >
               <Grid item xs={6}>
-                <StyledLabel>Sku*</StyledLabel>
+                <StyledLabel>Sku</StyledLabel>
                 <TextField
                   value={productStore.productToBeUpdated.sku}
                   onChange={(e) => handleInputChange("sku", e.target.value)}
                   size="small"
-                  error={isSkuFilled}
+                  error={
+                    isSkuFilled ||
+                    productStore.notValidFields.find(
+                      (element: any) => element.field === "sku"
+                    )
+                      ? true
+                      : false
+                  }
                 />
               </Grid>
               <Grid item xs={6}>
@@ -440,6 +473,14 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
                     ),
                   }}
                   type="number"
+                  error={
+                    isSkuFilled ||
+                    productStore.notValidFields.find(
+                      (element: any) => element.field === "regular_price"
+                    )
+                      ? true
+                      : false
+                  }
                 />
               </Grid>
               <Grid item xs={6}>
@@ -603,6 +644,15 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
             component={<Alert severity="success">Product Saved</Alert>}
             open={productStore.productsaved}
             handleClose={handleCloseSavedMessage}
+          />
+          <BasicModal
+            component={
+              <Alert severity="error">
+                You have to complete all required fields
+              </Alert>
+            }
+            open={isValidFields}
+            handleClose={handleCloseRequiredError}
           />
         </>
       ) : null}
