@@ -6,9 +6,9 @@ import ProductAttributes from "../common/components/productAttributes";
 import ProductVariations from "../common/components/productVariations";
 import Loading from "../common/components/loading";
 import SearchInput from "../common/components/search/searchInput";
-// import { EditorState, ContentState, convertFromHTML } from "draft-js";
-// import { Editor } from "react-draft-wysiwyg";
-// import { convertToHTML } from "draft-convert";
+import { EditorState, ContentState, convertFromHTML } from "draft-js";
+import { Editor } from "react-draft-wysiwyg";
+import { convertToHTML } from "draft-convert";
 // import DOMPurify from "dompurify";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { observer } from "mobx-react-lite";
@@ -24,7 +24,6 @@ import FixedBottom from "../common/components/fixedBottomContainer";
 import { StyledLabel } from "../common/components/styledComponents";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
-import TextareaAutosize from "@mui/base/TextareaAutosize";
 import Grid from "@mui/material/Grid";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -43,16 +42,12 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
   const [isSearchBySku, setIsSearchBySku] = useState(true);
   const [isSkuFilled, setIsSkuFilled] = useState(false);
   const [isValidFields, setIsValidFields] = useState(false);
-  // const [editorState, setEditorState] = useState(
-  //   () => EditorState.createEmpty()
-  //   // EditorState.createWithContent(
-  //   //   ContentState.createFromBlockArray(convertFromHTML('<p>My initial content.</p>'))
-  //   // )
-  // );
-
-  useEffect(() => {
-    preferencesStore.getPreferences();
-  }, []);
+  const [editorStateDescr, setEditorStateDescr] = useState(() =>
+    EditorState.createEmpty()
+  );
+  const [editorStateShortDescr, setEditorStateShortDescr] = useState(() =>
+    EditorState.createEmpty()
+  );
 
   useEffect(() => {
     if (viewState === "create") {
@@ -62,10 +57,42 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
     }
   }, [viewState]);
 
-  // useEffect(() => {
-  //   let html: any = convertToHTML(editorState.getCurrentContent());
-  //   handleInputChange("description", html);
-  // }, [editorState]);
+  useEffect(() => {
+    let html: any = convertToHTML(editorStateDescr.getCurrentContent());
+    handleInputChange("description", html);
+  }, [editorStateDescr]);
+
+  useEffect(() => {
+    let html: any = convertToHTML(editorStateShortDescr.getCurrentContent());
+    handleInputChange("short_description", html);
+  }, [editorStateShortDescr]);
+
+  useEffect(() => {
+    if (viewState === "update") {
+      const descr = convertFromHTML(
+        productStore.productToBeUpdated.description
+      );
+      setEditorStateDescr(
+        EditorState.createWithContent(
+          ContentState.createFromBlockArray(
+            descr.contentBlocks,
+            descr.entityMap
+          )
+        )
+      );
+      const shortDescr = convertFromHTML(
+        productStore.productToBeUpdated.short_description
+      );
+      setEditorStateShortDescr(
+        EditorState.createWithContent(
+          ContentState.createFromBlockArray(
+            shortDescr.contentBlocks,
+            shortDescr.entityMap
+          )
+        )
+      );
+    }
+  }, [productStore.productToBeUpdated.id]);
 
   if (productStore.productsaved) {
     document.documentElement.scrollTop = 0;
@@ -366,30 +393,52 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
               }
             />
             <StyledLabel>Description</StyledLabel>
-            <TextareaAutosize
-              minRows={10}
-              value={productStore.productToBeUpdated.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
-              style={{ width: "100%" }}
-            />
-            {/* <Editor
-              editorState={editorState}
-              // editorState={convertToHtml(productStore.productToBeUpdated.description)}
-              onEditorStateChange={setEditorState}
+            <Editor
+              editorState={editorStateDescr}
+              onEditorStateChange={setEditorStateDescr}
               wrapperClassName="wrapper-class"
               editorClassName="editor-class"
               toolbarClassName="toolbar-class"
-              // value={productStore.productToBeUpdated.description}
-              // onChange={(e) => handleInputChange("description", e.target.value)}
-            /> */}
+              toolbar={{
+                options: [
+                  "blockType",
+                  "inline",
+                  "fontSize",
+                  "list",
+                  "textAlign",
+                  "history",
+                  "link",
+                ],
+                inline: { inDropdown: false },
+                list: { inDropdown: false },
+                textAlign: { inDropdown: true },
+                link: { inDropdown: true },
+                history: { inDropdown: true },
+              }}
+            />
             <StyledLabel>Short Description</StyledLabel>
-            <TextareaAutosize
-              minRows={5}
-              value={productStore.productToBeUpdated.short_description}
-              onChange={(e) =>
-                handleInputChange("short_description", e.target.value)
-              }
-              style={{ width: "100%" }}
+            <Editor
+              toolbar={{
+                options: [
+                  "blockType",
+                  "inline",
+                  "fontSize",
+                  "list",
+                  "textAlign",
+                  "history",
+                  "link",
+                ],
+                inline: { inDropdown: false },
+                list: { inDropdown: false },
+                textAlign: { inDropdown: true },
+                link: { inDropdown: true },
+                history: { inDropdown: true },
+              }}
+              editorState={editorStateShortDescr}
+              onEditorStateChange={setEditorStateShortDescr}
+              wrapperClassName="wrapper-class"
+              editorClassName="editor-class"
+              toolbarClassName="toolbar-class"
             />
             <StyledLabel>Attributes</StyledLabel>
             <ProductAttributes
