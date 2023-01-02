@@ -74,6 +74,14 @@ export default function Preferences({ visible }: PreferencesProps) {
             checked={JSON.parse(JSON.stringify(preferences)).showSlug}
           />
         </div>
+        <div>
+          <span className="title">Auto Generate Variations Sku</span>
+          <Switch
+            value="autoGenSku"
+            onChange={handleChange}
+            checked={JSON.parse(JSON.stringify(preferences)).autoGenSku}
+          />
+        </div>
       </ModalContainer>
     );
   };

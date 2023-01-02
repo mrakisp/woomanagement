@@ -1,6 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import axios from "axios";
 import { productsEndPoint, token } from "../config/config";
+import productStore from "./productStore";
 
 class productVariationsStore {
   productVariations: any[] = [];
@@ -8,6 +9,8 @@ class productVariationsStore {
   variationChanged = false;
   initialProductVariations: any[] = [];
   loadingSave = false;
+  // isAutoCreatingVriations = false;
+  // variationsSettedAuto = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -15,21 +18,36 @@ class productVariationsStore {
 
   //fetch variations
   async getProductVariations(productId: number) {
-    this.loading = true;
-    axios({
-      method: "get",
-      url: productsEndPoint + productId + "/variations/?" + token,
-    }).then((response) => {
-      if (response && response.data && response.data.length > 0) {
-        //todo
-        response.data.forEach((element: any) => {
-          element.sku = element.sku + "-" + element.attributes[0]?.option;
-        });
-      }
+    if (!productStore.isSavedAndClone && !productStore.autoCreateVariations) {
+      this.loading = true;
+      axios({
+        method: "get",
+        url: productsEndPoint + productId + "/variations/?" + token,
+      })
+        .then((response) => {
+          // if (response && response.data && response.data.length > 0) {
+          //   //todo
+          //   response.data.forEach((element: any) => {
+          //     element.sku = element.sku + "-" + element.attributes[0]?.option;
+          //   });
+          // }
+          // if(this.productVariations && this.productVariations.length > 0){
+          //   this.productVariations.find(
+          //     (element: any) =>
+          //       element.id === "sku"
+          //   )
+          // }
 
-      this.setProductVariation(response.data);
-      this.loading = false;
-    });
+          this.setProductVariation(response.data);
+          this.loading = false;
+        })
+        .catch(function (error) {
+          alert(error.response.data.message);
+          return Promise.reject(error);
+        });
+    } else {
+      productStore.autoCreateVariations = false;
+    }
   }
 
   setProductVariation(data: any, createView?: boolean) {
@@ -51,6 +69,7 @@ class productVariationsStore {
       this.productVariations[variationIndex].manage_stock = true;
     }
     this.variationChanged = true;
+    productStore.isProductChanged = true;
   }
 
   saveVariations(productId: number) {
@@ -78,17 +97,22 @@ class productVariationsStore {
       method: "post",
       url: productsEndPoint + productId + "/variations/batch?" + token,
       data,
-    }).then((response) => {
-      this.variationChanged = false;
+    })
+      .then((response) => {
+        this.variationChanged = false;
 
-      response.data.update.sort(function (a: any, b: any) {
-        return a.id - b.id || a.name.localeCompare(b.name);
+        response.data.update.sort(function (a: any, b: any) {
+          return a.id - b.id || a.name.localeCompare(b.name);
+        });
+        // this.initialProductVariations = response.data.update;
+        this.loadingSave = false;
+        // this.setProductVariation(response.data);
+        // variationsStore.loading = false;
+      })
+      .catch(function (error) {
+        alert(error.response.data.message);
+        return Promise.reject(error);
       });
-      // this.initialProductVariations = response.data.update;
-      this.loadingSave = false;
-      // this.setProductVariation(response.data);
-      // variationsStore.loading = false;
-    });
   }
 
   copyValues(property: string) {

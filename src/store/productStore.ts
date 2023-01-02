@@ -3,7 +3,7 @@ import axios from "axios";
 import { productsEndPoint, token } from "../config/config";
 import { filter, uniq, isEqual } from "lodash";
 import variationsStore from "./variationsStore";
-
+// import { getLocalStorageUtil } from "../common/utils/setGetLocalStorage";
 // interface Product {
 //   name: string;
 //   slug: string;
@@ -75,12 +75,15 @@ class productStore {
   userStatusSelection: string = "publish";
   notValidFields = [{}]; //[{field:"sku",isValid:false,field:"regular_price",isValid:false}]
   notValidVariations = [{}];
+  isSavedAndClone = false;
+  numberPressedForSku = 0;
 
   constructor() {
     makeAutoObservable(this);
   }
 
   createProduct(createView?: boolean) {
+    this.loading = true;
     //if is create product view and variations applied
     if (
       createView &&
@@ -88,7 +91,6 @@ class productStore {
         (element: any) => element.variation
       )
     ) {
-      this.loading = true;
       this.productToBeUpdated.type = "variable"; //set variable automaticaly
       this.productToBeUpdated.manage_stock = false; //set general manage_stock automaticaly
       this.productToBeUpdated.status = "draft"; //set to draft until final save by user
@@ -98,23 +100,38 @@ class productStore {
       method: "post",
       url: productsEndPoint + "?" + token,
       data: this.productToBeUpdated,
-    }).then((response) => {
-      this.loading = false;
+    })
+      .then((response) => {
+        this.loading = false;
 
-      if (
-        createView &&
-        this.productToBeUpdated.attributes.find(
-          (element: any) => element.variation
-        )
-      ) {
-        this.productToBeUpdated.attributes = response.data.attributes;
-
-        this.productToBeUpdated.id = response.data.id; //set product id - automatic created
-        this.updateAttributesWithVariations(createView);
-      } else {
-        this.resetCreateProduct();
-      }
-    });
+        if (
+          createView &&
+          this.productToBeUpdated.attributes.find(
+            (element: any) => element.variation
+          )
+        ) {
+          this.productToBeUpdated.attributes = response.data.attributes;
+          this.isSavedAndClone = true;
+          this.productToBeUpdated.id = response.data.id; //set product id - automatic created
+          this.updateAttributesWithVariations(createView);
+        } else {
+          if (this.isSavedAndClone) {
+            this.productToBeUpdated.id = null;
+            this.productToBeUpdated.sku = "";
+            this.productToBeUpdated.name =
+              this.productToBeUpdated.name + " Copy";
+            this.loading = false;
+            this.isProductChanged = false;
+            this.productsaved = true;
+          } else {
+            this.resetCreateProduct();
+          }
+        }
+      })
+      .catch(function (error) {
+        alert(error.response.data.message);
+        return Promise.reject(error);
+      });
   }
 
   updateProduct(viewState?: string) {
@@ -123,6 +140,18 @@ class productStore {
     const productData = this.productToBeUpdated;
     this.productToBeUpdated.status = this.userStatusSelection;
     this.dataToBeUpdated.status = this.userStatusSelection;
+
+    if (
+      this.productToBeUpdated.type === "variable" &&
+      this.productToBeUpdated.variations.length > 0
+    ) {
+      variationsStore.productVariations.forEach((element) => {
+        if (element.sku === this.productToBeUpdated.sku) {
+          alert("error in sku variations");
+        }
+      });
+      variationsStore.saveVariations(this.productToBeUpdated.id);
+    }
 
     if (
       this.productToBeUpdated.type === "variable" &&
@@ -138,13 +167,42 @@ class productStore {
         method: "put",
         url: productsEndPoint + productData.id + "?" + token,
         data: this.dataToBeUpdated,
-      }).then((response) => {
-        this.resetLoading();
-        this.initialProduct = response.data;
-        if (viewState === "create") {
-          this.resetCreateProduct();
-        }
-      });
+      })
+        .then((response) => {
+          this.resetLoading();
+          this.initialProduct = response.data;
+          if (viewState === "create") {
+            if (this.isSavedAndClone) {
+              /*const preferences = getLocalStorageUtil("preferences");
+
+              //JSON.parse(JSON.stringify(preferences)).autoGenSku
+              let tempsku = this.productToBeUpdated.sku;
+              if (this.numberPressedForSku > 0) {
+                tempsku = this.productToBeUpdated.sku.slice(0, -1);
+              }
+              this.productToBeUpdated.sku = tempsku + this.numberPressedForSku;
+              this.numberPressedForSku++;*/
+              this.productToBeUpdated.sku = "";
+              this.dataToBeUpdated.sku = "";
+
+              this.productToBeUpdated.id = null;
+              this.productToBeUpdated.name =
+                this.productToBeUpdated.name + " Copy";
+              this.loading = false;
+              this.isProductChanged = false;
+              this.productsaved = true;
+              this.createTempProduct();
+            } else {
+              this.numberPressedForSku = 0;
+              this.resetCreateProduct();
+            }
+          }
+        })
+        .catch(function (error) {
+          alert(error.response.data.message);
+          console.log("Show error notification!");
+          return Promise.reject(error);
+        });
     }
   }
 
@@ -183,9 +241,9 @@ class productStore {
       }
     } else {
       variationsStore.productVariations.forEach((element, index): void => {
-        if (!element.sku) {
-          this.notValidVariations.push({ field: "sku", index: index });
-        }
+        // if (!element.sku) {
+        //   this.notValidVariations.push({ field: "sku", index: index });
+        // }
         if (!element.regular_price) {
           this.notValidVariations.push({
             field: "regular_price",
@@ -215,6 +273,8 @@ class productStore {
     this.attributesToBeUpdated = {};
     this.attributesWarning = false;
     this.autoCreateVariations = false;
+    this.notValidFields = [];
+    this.notValidVariations = [];
     if (!fromCancelButton) this.productsaved = true;
   }
 
@@ -451,6 +511,9 @@ class productStore {
   }
 
   createTempProduct() {
+    if (this.isSavedAndClone) {
+      this.isSavedAndClone = false;
+    }
     this.autoCreateVariations = true;
     this.createProduct(true);
   }
@@ -464,13 +527,18 @@ class productStore {
       method: "put",
       url: productsEndPoint + productData.id + "?" + token,
       data: { attributes: this.attributesToBeUpdated },
-    }).then((response) => {
-      this.productToBeUpdated.attributes = response.data.attributes;
-      this.dataToBeUpdated.attributes = response.data.attributes;
-      this.initialProduct.attributes = response.data.attributes;
+    })
+      .then((response) => {
+        this.productToBeUpdated.attributes = response.data.attributes;
+        this.dataToBeUpdated.attributes = response.data.attributes;
+        this.initialProduct.attributes = response.data.attributes;
 
-      this.createUpdateProductVariations(createView);
-    });
+        this.createUpdateProductVariations(createView);
+      })
+      .catch(function (error) {
+        alert(error.response.data.message);
+        return Promise.reject(error);
+      });
   }
 
   // invoke service - create and save variations based on selected attributes
@@ -495,29 +563,43 @@ class productStore {
 
     const data = {
       create: createVariTerms,
-      delete: this.productToBeUpdated.variations,
+      delete:
+        this.isSavedAndClone && createView
+          ? []
+          : this.productToBeUpdated.variations,
     };
 
     axios({
       method: "post",
       url: productsEndPoint + productData.id + "/variations/batch?" + token,
       data,
-    }).then((response) => {
-      if (response && response.data && response.data.create?.length > 0) {
-        if (createView) {
-          response.data.create.forEach((element: { id: any }) => {
+    })
+      .then((response) => {
+        if (response && response.data && response.data.create?.length > 0) {
+          response.data.create.forEach((element: any) => {
             this.productToBeUpdated.variations.push(element.id);
+            element.sku = element.sku + "-" + element.attributes[0]?.option;
           });
-          this.autoCreateVariations = false;
+          if (createView) {
+            //this.autoCreateVariations = false;
+            this.isSavedAndClone = false;
+          }
+          variationsStore.setProductVariation(response.data.create, createView);
+          // if (createView) {
+          //   this.autoCreateVariations = false;
+          // }
+        } else {
+          variationsStore.setProductVariation([]);
         }
-        variationsStore.setProductVariation(response.data.create, createView);
-      } else {
-        variationsStore.setProductVariation([]);
-      }
-      variationsStore.variationChanged = true;
-      variationsStore.loading = false;
-      this.loading = false;
-    });
+        variationsStore.variationChanged = true;
+        variationsStore.loading = false;
+        // this.isProductChanged = false;
+        this.loading = false;
+      })
+      .catch(function (error) {
+        alert(error.response.data.message);
+        return Promise.reject(error);
+      });
   }
 
   resetLoading() {

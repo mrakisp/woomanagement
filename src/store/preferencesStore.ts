@@ -6,6 +6,7 @@ class preferencesStore {
     showWeight: true,
     showFeatured: true,
     showSlug: true,
+    autoGenSku: true,
   };
 
   constructor() {

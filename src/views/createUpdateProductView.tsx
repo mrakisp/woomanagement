@@ -6,6 +6,11 @@ import ProductAttributes from "../common/components/productAttributes";
 import ProductVariations from "../common/components/productVariations";
 import Loading from "../common/components/loading";
 import SearchInput from "../common/components/search/searchInput";
+// import { EditorState, ContentState, convertFromHTML } from "draft-js";
+// import { Editor } from "react-draft-wysiwyg";
+// import { convertToHTML } from "draft-convert";
+// import DOMPurify from "dompurify";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { observer } from "mobx-react-lite";
 import { isEmpty } from "lodash";
 import {
@@ -38,6 +43,12 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
   const [isSearchBySku, setIsSearchBySku] = useState(true);
   const [isSkuFilled, setIsSkuFilled] = useState(false);
   const [isValidFields, setIsValidFields] = useState(false);
+  // const [editorState, setEditorState] = useState(
+  //   () => EditorState.createEmpty()
+  //   // EditorState.createWithContent(
+  //   //   ContentState.createFromBlockArray(convertFromHTML('<p>My initial content.</p>'))
+  //   // )
+  // );
 
   useEffect(() => {
     preferencesStore.getPreferences();
@@ -50,6 +61,15 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
       productStore.productToBeUpdated = {};
     }
   }, [viewState]);
+
+  // useEffect(() => {
+  //   let html: any = convertToHTML(editorState.getCurrentContent());
+  //   handleInputChange("description", html);
+  // }, [editorState]);
+
+  if (productStore.productsaved) {
+    document.documentElement.scrollTop = 0;
+  }
 
   const handleCloseAttributeWarning = () => {
     productStore.attributesWarning = false;
@@ -64,6 +84,20 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
   };
 
   const handleSave = () => {
+    productStore.isSavedAndClone = false;
+    if (productStore.validateFields()) {
+      if (viewState === "create" && !productStore.productToBeUpdated.id) {
+        productStore.createProduct();
+      } else if (productStore.isProductChanged) {
+        productStore.updateProduct(viewState);
+      }
+    } else {
+      setIsValidFields(true);
+    }
+  };
+
+  const handleSaveAndClone = () => {
+    productStore.isSavedAndClone = true;
     if (productStore.validateFields()) {
       if (viewState === "create" && !productStore.productToBeUpdated.id) {
         productStore.createProduct();
@@ -150,6 +184,8 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
       } else {
         productStore.saveAttributeVariation();
       }
+      // const element = document.getElementById("div");
+      // document.getElementById("productVariations")?.scrollIntoView();
     }
   };
 
@@ -193,12 +229,23 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
       icon={<CancelIcon />}
       sx={{ marginLeft: 5 }}
     />,
+    viewState === "create" && (
+      <Button
+        isLoading={productStore.loading}
+        onClick={handleSaveAndClone}
+        disabled={!productStore.isProductChanged}
+        text="save & clone"
+        key="button4"
+        icon={<SaveIcon />}
+        sx={{ marginLeft: 5 }}
+      />
+    ),
     <Button
       isLoading={productStore.loading}
       onClick={handleSave}
       disabled={!productStore.isProductChanged}
       text="save"
-      key="button4"
+      key="button5"
       icon={<SaveIcon />}
       sx={{ marginLeft: 5 }}
     />,
@@ -325,6 +372,16 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
               onChange={(e) => handleInputChange("description", e.target.value)}
               style={{ width: "100%" }}
             />
+            {/* <Editor
+              editorState={editorState}
+              // editorState={convertToHtml(productStore.productToBeUpdated.description)}
+              onEditorStateChange={setEditorState}
+              wrapperClassName="wrapper-class"
+              editorClassName="editor-class"
+              toolbarClassName="toolbar-class"
+              // value={productStore.productToBeUpdated.description}
+              // onChange={(e) => handleInputChange("description", e.target.value)}
+            /> */}
             <StyledLabel>Short Description</StyledLabel>
             <TextareaAutosize
               minRows={5}
@@ -349,8 +406,9 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
               <>
                 <StyledLabel>Variations</StyledLabel>
                 {productStore.productToBeUpdated.variations &&
-                productStore.productToBeUpdated.variations.length > 0 ? (
-                  <>
+                productStore.productToBeUpdated.variations.length > 0 &&
+                productStore.productToBeUpdated.id ? (
+                  <div id="productVariations">
                     <ProductVariations
                       selectedAttributes={
                         productStore.productToBeUpdated.attributes
@@ -358,7 +416,7 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
                       errors={productStore.notValidVariations}
                       productId={productStore.productToBeUpdated.id}
                     />
-                  </>
+                  </div>
                 ) : (
                   <div
                     style={{
@@ -407,12 +465,12 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
                   <span
                     style={{
                       color:
-                        productStore.productToBeUpdated.status === "publish"
+                        productStore.userStatusSelection === "publish"
                           ? "#239b78"
                           : "#9b2323",
                     }}
                   >
-                    {productStore.productToBeUpdated.status}
+                    {productStore.userStatusSelection}
                   </span>
                 </span>
                 <Switch
@@ -474,7 +532,6 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
                   }}
                   type="number"
                   error={
-                    isSkuFilled ||
                     productStore.notValidFields.find(
                       (element: any) => element.field === "regular_price"
                     )
