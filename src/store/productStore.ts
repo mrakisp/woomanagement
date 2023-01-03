@@ -21,7 +21,7 @@ class productStore {
   productsaved = false;
   autoCreateVariations = false; // for new product
   userStatusSelection: string = "publish";
-  notValidFields = [{}]; //[{field:"sku",isValid:false,field:"regular_price",isValid:false}]
+  notValidFields = [{}];
   notValidVariations = [{}];
   isSavedAndClone = false;
   numberPressedForSku = 0;
@@ -41,9 +41,20 @@ class productStore {
     ) {
       this.productToBeUpdated.type = "variable"; //set variable automaticaly
       this.productToBeUpdated.manage_stock = false; //set general manage_stock automaticaly
-      if (this.isSavedAndClone) {
+      if (this.autoCreateVariations) {
         this.productToBeUpdated.status = "draft";
       } //set to draft until final save by user
+    }
+    if (
+      this.productToBeUpdated.type === "simple" &&
+      this.productToBeUpdated.stock_quantity !== ""
+    ) {
+      this.productToBeUpdated.manage_stock = true;
+    } else if (
+      this.productToBeUpdated.type === "simple" &&
+      !this.productToBeUpdated.stock_quantity
+    ) {
+      this.productToBeUpdated.stock_quantity = 0;
     }
 
     axios({
@@ -78,8 +89,9 @@ class productStore {
           }
         }
       })
-      .catch(function (error) {
+      .catch((error) => {
         alert(error.response.data.message);
+        this.loading = false;
         return Promise.reject(error);
       });
   }
@@ -97,7 +109,9 @@ class productStore {
     ) {
       variationsStore.productVariations.forEach((element) => {
         if (element.sku === this.productToBeUpdated.sku) {
-          alert("error in sku variations");
+          alert(
+            "Invalid or Duplicate sku in  variations. Please Change SKU's in Variations"
+          );
         }
       });
       variationsStore.saveVariations(this.productToBeUpdated.id);
@@ -148,9 +162,11 @@ class productStore {
             }
           }
         })
-        .catch(function (error) {
-          alert(error.response.data.message);
-          console.log("Show error notification!");
+        .catch((error) => {
+          alert(
+            error.response.data.message + " Please Change SKU's in Variations"
+          );
+          this.loading = false;
           return Promise.reject(error);
         });
     }
@@ -271,8 +287,8 @@ class productStore {
       regular_price: "",
       sale_price: "",
       total_sales: 0,
-      manage_stock: true,
-      stock_quantity: 0,
+      manage_stock: false,
+      stock_quantity: "",
       backorders_allowed: false,
       backordered: false,
       sold_individually: false,
@@ -528,7 +544,7 @@ class productStore {
         if (response && response.data && response.data.create?.length > 0) {
           response.data.create.forEach((element: any) => {
             this.productToBeUpdated.variations.push(element.id);
-            element.sku = element.sku + "-" + element.attributes[0]?.option;
+            element.sku = ""; //element.sku + "-" + element.attributes[0]?.option;
           });
           if (createView) {
             //this.autoCreateVariations = false;

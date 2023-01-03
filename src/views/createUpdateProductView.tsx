@@ -9,7 +9,6 @@ import SearchInput from "../common/components/search/searchInput";
 import { EditorState, ContentState, convertFromHTML } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import { convertToHTML } from "draft-convert";
-// import DOMPurify from "dompurify";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { observer } from "mobx-react-lite";
 import { isEmpty } from "lodash";
@@ -51,7 +50,7 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
 
   useEffect(() => {
     if (viewState === "create") {
-      productStore.setCreateProductModel();
+      productStore.resetCreateProduct(true);
     } else {
       productStore.productToBeUpdated = {};
     }
@@ -158,7 +157,6 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
     propertyToBeUpdated: string,
     value: string | number | boolean
   ) => {
-    debugger;
     setIsSkuFilled(false);
 
     //remove error
@@ -320,7 +318,7 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
               )}
             </Grid>
             <Grid item xs={3}>
-              Change Search
+              Change Search By {isSearchBySku ? "Name" : "Sku"}
               <br />
               <Switch onChange={(e) => setIsSearchBySku(!isSearchBySku)} />
             </Grid>
@@ -674,7 +672,10 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
                   <>
                     <StyledLabel>
                       Stock Quantity
-                      <Tooltip title="Stock will be used only for simple product. If you use variations, variations stock will be applied">
+                      <Tooltip
+                        title="Stock will be used only for simple product. If you use variations, variations stock will be applied. If you let it empty, 
+                      then product will have infinite stock quantity. Add 0 if you need it out of stock."
+                      >
                         <InfoIcon
                           sx={{
                             marginLeft: "auto",

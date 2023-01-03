@@ -21,7 +21,6 @@ class preferencesStore {
     if (preferences) this.preferences = JSON.parse(preferences);
   }
   getPreferencesByVal(prop: string) {
-    debugger;
     const property = prop;
     const val = JSON.parse(getLocalStorageUtil("preferences"));
     if (val) return val[property];

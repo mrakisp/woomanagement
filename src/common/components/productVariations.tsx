@@ -3,10 +3,8 @@ import productVariations from "../../store/variationsStore";
 import { observer } from "mobx-react-lite";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
-// import SaveIcon from "@mui/icons-material/Save";
 import ContentPasteGoIcon from "@mui/icons-material/ContentPasteGo";
-// import Button from "./button";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import { amountSymbol } from "../../config/config";
 import Loading from "./loading";
 import ProductStore from "../../store/productStore";
@@ -57,17 +55,6 @@ const VariationLabel = styled.div`
   }
 `;
 
-// function blinkingEffect() {
-//   return keyframes`
-//     50% {
-//       opacity: 0;
-//     }
-//   `;
-// }
-// const AnimatedComponent = styled.div`
-//   animation: ${blinkingEffect} 1s linear infinite;
-// `;
-
 const ProductVariations = function ProductVariations({
   productId,
   errors,
@@ -107,10 +94,6 @@ const ProductVariations = function ProductVariations({
     }
     return true;
   };
-
-  // const handleSaveVariations = () => {
-  //   productVariations.saveVariations(productId);
-  // };
 
   useEffect(() => {
     if (productId) {
@@ -336,7 +319,7 @@ const ProductVariations = function ProductVariations({
                           ? ProductStore.productToBeUpdated.sku +
                             "-" +
                             variation.attributes[0]?.option
-                          : "" //variation.sku
+                          : variation.sku
                         // ? variation.sku
                         // : ""
                       }
@@ -367,37 +350,6 @@ const ProductVariations = function ProductVariations({
             )
         )
       )}
-      {/* {productVariations.variationChanged ? (
-        <AnimatedComponent>
-          <Button
-            onClick={handleSaveVariations}
-            text="Save Variations"
-            size="medium"
-            icon={<SaveIcon />}
-            sx={{
-              marginLeft: "auto",
-              display: "flex",
-              marginTop: "20px",
-            }}
-            isLoading={productVariations.loadingSave}
-          />
-        </AnimatedComponent>
-      ) : (
-        <>
-          <Button
-            onClick={handleSaveVariations}
-            text="Save Variations"
-            size="medium"
-            icon={<SaveIcon />}
-            sx={{
-              marginLeft: "auto",
-              display: "flex",
-              marginTop: "20px",
-            }}
-            isLoading={productVariations.loadingSave}
-          />
-        </>
-      )} */}
     </div>
   );
 };

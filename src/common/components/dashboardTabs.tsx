@@ -57,7 +57,7 @@ export default function CenteredTabs() {
         {/* <Tab label="Product List" /> */}
         <Tab label="Create Product" />
         <Tab label="Update Product" />
-        <Preferences visible={value === 1 || value === 2} />
+        <Preferences visible={value === 0 || value === 1 || value === 2} />
       </Tabs>
       <TabPanel value={value} index={0}>
         <DashboardView />
