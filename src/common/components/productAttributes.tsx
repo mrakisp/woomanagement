@@ -92,25 +92,28 @@ const ProductAttributes = function ProductAttributes({
   const [isSynchMessageVisible, setSsSynchMessageVisible] = useState(false);
   const [showWarningOnPaste, setShowWarningOnPaste] = useState(false);
 
-  let attributesTerms: any = [];
-  selectedAttributes?.forEach((row) => {
-    row?.options?.forEach((term: any) => {
-      attributesTerms.push(term);
-    });
-  });
-
-  let showButtonSaveAttr = false;
-  if (selectedAttributes?.find((element) => element.variation)) {
-    showButtonSaveAttr = true;
-  }
-
   let showCheckForVariationsButton = false;
-  if (
-    viewState === "create" ||
-    (viewState === "update" &&
-      selectedAttributes?.find((element) => element.variation))
-  ) {
-    showCheckForVariationsButton = true;
+  let showButtonSaveAttr = false;
+  let attributesTerms: any = [];
+
+  if (selectedAttributes && selectedAttributes.length > 0) {
+    selectedAttributes.forEach((row) => {
+      row.options.forEach((term: any) => {
+        attributesTerms.push(term);
+      });
+    });
+
+    if (selectedAttributes?.find((element) => element.variation)) {
+      showButtonSaveAttr = true;
+    }
+
+    if (
+      viewState === "create" ||
+      (viewState === "update" &&
+        selectedAttributes?.find((element) => element.variation))
+    ) {
+      showCheckForVariationsButton = true;
+    }
   }
 
   const handleSearch = (
@@ -174,6 +177,7 @@ const ProductAttributes = function ProductAttributes({
         label={`Search Attributes`}
         variant="outlined"
         size="small"
+        value={searchAttribute ? searchAttribute : ""}
         onChange={(e) => handleSearch(e)}
         sx={{
           position: "sticky",
@@ -231,118 +235,136 @@ const ProductAttributes = function ProductAttributes({
       </Alert>
       <>
         <div>
-          {attributesStore.productAttributes.map((attribute, index) => (
-            <AttributeRow
-              key={index}
-              // hidden={
-              //   searchAttribute !== "" &&
-              //   !attribute.name.includes(searchAttribute) &&
-              //   !attribute.options
-              //     .find((element) => searchAttribute)
-              //     .includes(searchAttribute)
-              // }
-            >
-              <AttributeLabel
-                key={attribute.id}
-                style={{ display: "flex", alignItems: "center" }}
+          {attributesTerms &&
+            attributesStore.productAttributes &&
+            attributesStore.productAttributes.map((attribute, index) => (
+              <AttributeRow
+                key={index}
+                // hidden={
+                //   searchAttribute !== "" &&
+                //   !attribute.name.includes(searchAttribute) &&
+                //   !attribute.options
+                //     .find((element) => searchAttribute)
+                //     .includes(searchAttribute)
+                // }
               >
-                {attribute.name}{" "}
-                <Checkbox
-                  // value={
-                  //   selectedAttributes.find(
-                  //     (element) => element.id === attribute.id
-                  //   )?.visible
-                  // }
-                  sx={{ marginLeft: "auto" }}
-                  key={"visible" + attribute.id}
-                  checked={
-                    selectedAttributes?.find(
-                      (element) => element.id === attribute.id
-                    )?.visible
-                      ? true
-                      : false
-                  }
-                  onClick={(e) => handleAttributeVisibility(e, attribute.id)}
-                />
-                <span>Visible on the product page</span>
-                {/* {selectedAttributes?.find((element) => element.variation)  */}
-                {showCheckForVariationsButton && (
-                  <>
-                    <div
-                      style={{
-                        borderLeft: "1px solid",
-                        paddingLeft: "10px",
-                        marginLeft: "20px",
-                        height: "20px",
-                      }}
-                    ></div>
-                    <Tooltip
-                      title="Only one attribute can be selected to be used for Variations. If its selected 
+                <AttributeLabel
+                  key={attribute.id ? attribute.id : index}
+                  style={{ display: "flex", alignItems: "center" }}
+                >
+                  {attribute.name}{" "}
+                  <Checkbox
+                    value={
+                      selectedAttributes?.find(
+                        (element) => element.id === attribute.id
+                      )?.visible
+                        ? true
+                        : false
+                    }
+                    sx={{ marginLeft: "auto" }}
+                    key={"visible" + attribute.id}
+                    checked={
+                      selectedAttributes?.find(
+                        (element) => element.id === attribute.id
+                      )?.visible
+                        ? true
+                        : false
+                    }
+                    onClick={(e) => handleAttributeVisibility(e, attribute.id)}
+                  />
+                  <span>Visible on the product page</span>
+                  {/* {selectedAttributes?.find((element) => element.variation)  */}
+                  {showCheckForVariationsButton && (
+                    <>
+                      <div
+                        style={{
+                          borderLeft: "1px solid",
+                          paddingLeft: "10px",
+                          marginLeft: "20px",
+                          height: "20px",
+                        }}
+                      ></div>
+                      <Tooltip
+                        title="Only one attribute can be selected to be used for Variations. If its selected 
                     and click on save attributes it cannot be de-selected"
+                      >
+                        <Checkbox
+                          key={
+                            "variationEnabled" + attribute.id
+                              ? attribute.id
+                              : index
+                          }
+                          // disabled={
+                          //   selectedAttributes.find(
+                          //     (element) => element.id === attribute.id
+                          //   )
+                          //     ? false
+                          //     : true
+                          // }
+                          checked={
+                            selectedAttributes?.find(
+                              (element) => element.id === attribute.id
+                            )?.variation
+                              ? true
+                              : false
+                          }
+                          value={
+                            selectedAttributes?.find(
+                              (element) => element.id === attribute.id
+                            )?.variation
+                              ? true
+                              : false
+                          }
+                          onChange={(e) =>
+                            handleAttributeIsForVariation(e, attribute.id)
+                          }
+                        />
+                      </Tooltip>
+
+                      <span>
+                        Used for variations
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            textTransform: "inherit",
+                          }}
+                        >
+                          (Save attributes to apply variations)
+                        </span>
+                      </span>
+                    </>
+                  )}
+                </AttributeLabel>
+                <AttributeList>
+                  {attribute.options.map((option) => (
+                    <AttributeItem
+                      key={option ? option : index}
+                      hidden={
+                        searchAttribute !== "" &&
+                        !option.includes(searchAttribute) &&
+                        !attributesTerms.includes(option)
+                      }
                     >
                       <Checkbox
-                        key={"variationEnabled" + attribute.id}
-                        // disabled={
-                        //   selectedAttributes.find(
-                        //     (element) => element.id === attribute.id
-                        //   )
-                        //     ? false
-                        //     : true
-                        // }
+                        key={"checkbox" + option ? option : index}
+                        sx={{ padding: "0 5px" }}
+                        value={attributesTerms.includes(option) ? true : false}
                         checked={
-                          selectedAttributes?.find(
-                            (element) => element.id === attribute.id
-                          )?.variation
-                            ? true
-                            : false
+                          attributesTerms.includes(option) ? true : false
                         }
-                        onChange={(e) =>
-                          handleAttributeIsForVariation(e, attribute.id)
+                        onClick={(e) =>
+                          handleAttributes(e, {
+                            option: option,
+                            attributeId: attribute.id,
+                          })
                         }
                       />
-                    </Tooltip>
-
-                    <span>
-                      Used for variations
-                      <span
-                        style={{
-                          fontSize: "12px",
-                          textTransform: "inherit",
-                        }}
-                      >
-                        (Save attributes to apply variations)
-                      </span>
-                    </span>
-                  </>
-                )}
-              </AttributeLabel>
-              <AttributeList>
-                {attribute.options.map((option) => (
-                  <AttributeItem
-                    key={option}
-                    hidden={
-                      searchAttribute !== "" &&
-                      !option.includes(searchAttribute) &&
-                      !attributesTerms.includes(option)
-                    }
-                  >
-                    <Checkbox
-                      key={"checkbox" + option}
-                      sx={{ padding: "0 5px" }}
-                      checked={attributesTerms.includes(option) ? true : false}
-                      onClick={(e) =>
-                        handleAttributes(e, {
-                          option: option,
-                          attributeId: attribute.id,
-                        })
-                      }
-                    />
-                    {option}
-                  </AttributeItem>
-                ))}
-              </AttributeList>
-            </AttributeRow>
-          ))}
+                      {option}
+                    </AttributeItem>
+                  ))}
+                </AttributeList>
+              </AttributeRow>
+            ))}
         </div>
         {showButtonSaveAttr && (
           <Button

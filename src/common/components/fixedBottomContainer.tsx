@@ -21,6 +21,7 @@ export default function FixedBottomNavigation({ buttons }: BottomNavProps) {
           bottom: 0,
           left: 0,
           right: 0,
+          zIndex: 9,
         }}
         elevation={3}
       >

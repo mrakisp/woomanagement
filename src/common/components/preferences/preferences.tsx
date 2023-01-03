@@ -42,7 +42,12 @@ export default function Preferences({ visible }: PreferencesProps) {
   const [preferences, setPreferences] = useLocalStorage<string>(
     "preferences",
     JSON.parse(
-      JSON.stringify({ showWeight: true, showFeatured: true, showSlug: true })
+      JSON.stringify({
+        showWeight: false,
+        showFeatured: true,
+        showSlug: true,
+        autoGenSku: false,
+      })
     )
   );
 

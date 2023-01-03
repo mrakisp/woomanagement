@@ -57,18 +57,11 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
     }
   }, [viewState]);
 
+  const productHasId = productStore.productToBeUpdated.id
+    ? productStore.productToBeUpdated.id
+    : "";
   useEffect(() => {
-    let html: any = convertToHTML(editorStateDescr.getCurrentContent());
-    handleInputChange("description", html);
-  }, [editorStateDescr]);
-
-  useEffect(() => {
-    let html: any = convertToHTML(editorStateShortDescr.getCurrentContent());
-    handleInputChange("short_description", html);
-  }, [editorStateShortDescr]);
-
-  useEffect(() => {
-    if (viewState === "update") {
+    if (viewState === "update" && productStore.productToBeUpdated.id) {
       const descr = convertFromHTML(
         productStore.productToBeUpdated.description
       );
@@ -92,11 +85,31 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
         )
       );
     }
-  }, [productStore.productToBeUpdated.id]);
+  }, [productHasId, viewState]);
 
-  if (productStore.productsaved) {
-    document.documentElement.scrollTop = 0;
-  }
+  const isProductSaved = productStore.productsaved ? true : false;
+  useEffect(() => {
+    if (productStore.productsaved) {
+      document.documentElement.scrollTop = 0;
+      const deafultdescr = convertFromHTML("<p></p>");
+      setEditorStateDescr(
+        EditorState.createWithContent(
+          ContentState.createFromBlockArray(
+            deafultdescr.contentBlocks,
+            deafultdescr.entityMap
+          )
+        )
+      );
+      setEditorStateShortDescr(
+        EditorState.createWithContent(
+          ContentState.createFromBlockArray(
+            deafultdescr.contentBlocks,
+            deafultdescr.entityMap
+          )
+        )
+      );
+    }
+  }, [isProductSaved]);
 
   const handleCloseAttributeWarning = () => {
     productStore.attributesWarning = false;
@@ -145,6 +158,7 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
     propertyToBeUpdated: string,
     value: string | number | boolean
   ) => {
+    debugger;
     setIsSkuFilled(false);
 
     //remove error
@@ -323,7 +337,7 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
               <Grid item xs={2} sm={2} md={1}>
                 <StyledLabel>Id</StyledLabel>
                 <TextField
-                  defaultValue={productStore.productToBeUpdated.id}
+                  value={productStore.productToBeUpdated.id}
                   disabled
                   variant="filled"
                   size="small"
@@ -332,7 +346,7 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
               <Grid item xs={2} sm={2} md={1}>
                 <StyledLabel>Sales</StyledLabel>
                 <TextField
-                  defaultValue={productStore.productToBeUpdated.total_sales}
+                  value={productStore.productToBeUpdated.total_sales}
                   disabled
                   variant="filled"
                   size="small"
@@ -341,7 +355,7 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
               <Grid item xs={2} sm={2} md={1}>
                 <StyledLabel>Low Stock</StyledLabel>
                 <TextField
-                  defaultValue={
+                  value={
                     productStore.productToBeUpdated.low_stock_amount &&
                     productStore.productToBeUpdated.low_stock_amount <=
                       productStore.productToBeUpdated.stock_quantity
@@ -364,7 +378,7 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
                     startAdornment: (
                       <InputAdornment position="start">
                         {viewState === "update" &&
-                          productStore.initialProduct.permalink.replace(
+                          productStore.initialProduct?.permalink?.replace(
                             productStore.initialProduct.slug + "/",
                             ""
                           )}
@@ -396,6 +410,12 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
             <Editor
               editorState={editorStateDescr}
               onEditorStateChange={setEditorStateDescr}
+              onChange={(e) =>
+                handleInputChange(
+                  "description",
+                  convertToHTML(editorStateDescr.getCurrentContent())
+                )
+              }
               wrapperClassName="wrapper-class"
               editorClassName="editor-class"
               toolbarClassName="toolbar-class"
@@ -436,13 +456,23 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
               }}
               editorState={editorStateShortDescr}
               onEditorStateChange={setEditorStateShortDescr}
+              onChange={(e) =>
+                handleInputChange(
+                  "short_description",
+                  convertToHTML(editorStateShortDescr.getCurrentContent())
+                )
+              }
               wrapperClassName="wrapper-class"
               editorClassName="editor-class"
               toolbarClassName="toolbar-class"
             />
             <StyledLabel>Attributes</StyledLabel>
             <ProductAttributes
-              selectedAttributes={productStore.productToBeUpdated.attributes}
+              selectedAttributes={
+                productStore.productToBeUpdated.attributes
+                  ? productStore.productToBeUpdated.attributes
+                  : []
+              }
               handleAttributes={handleAttributes}
               handleAttributeVisibility={handleAttributeVisibility}
               handleAttributeIsForVariation={handleAttributeIsForVariation}
@@ -461,6 +491,8 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
                     <ProductVariations
                       selectedAttributes={
                         productStore.productToBeUpdated.attributes
+                          ? productStore.productToBeUpdated.attributes
+                          : []
                       }
                       errors={productStore.notValidVariations}
                       productId={productStore.productToBeUpdated.id}

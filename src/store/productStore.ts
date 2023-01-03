@@ -1,64 +1,12 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, configure } from "mobx";
 import axios from "axios";
 import { productsEndPoint, token } from "../config/config";
 import { filter, uniq, isEqual } from "lodash";
 import variationsStore from "./variationsStore";
-// import { getLocalStorageUtil } from "../common/utils/setGetLocalStorage";
-// interface Product {
-//   name: string;
-//   slug: string;
-//   permalink: string;
-//   date_created: Date;
-//   date_created_gmt: Date;
-//   date_modified: Date;
-//   date_modified_gmt: Date;
-//   type: string;
-//   status: string;
-//   featured: false;
-//   catalog_visibility: string;
-//   description: string;
-//   short_description: string;
-//   sku: string;
-//   price: string | number;
-//   regular_price: string | number;
-//   sale_price: string | number;
-//   on_sale: false;
-//   purchasable: true;
-//   total_sales: 0;
-//   virtual: false;
-//   downloadable: false;
-//   downloads: [];
-//   tax_status: string;
-//   tax_class: "";
-//   manage_stock: boolean;
-//   stock_quantity: number;
-//   stock_status: string;
-//   backorders: string;
-//   backorders_allowed: false;
-//   backordered: false;
-//   sold_individually: false;
-//   weight: string;
-//   dimensions: {
-//     length: string;
-//     width: string;
-//     height: string;
-//   };
-//   shipping_required: true;
-//   shipping_taxable: true;
-//   shipping_class: string;
-//   shipping_class_id: 0;
-//   reviews_allowed: true;
-//   upsell_ids: [];
-//   cross_sell_ids: [];
-//   parent_id: 0;
-//   categories: any;
-//   tags: [];
-//   images: [];
-//   attributes: [];
-//   default_attributes: [];
-//   variations: [];
-//   meta_data: [];
-// }
+
+configure({
+  enforceActions: "never",
+});
 
 class productStore {
   productToBeCreated: any | null = {};
@@ -93,7 +41,9 @@ class productStore {
     ) {
       this.productToBeUpdated.type = "variable"; //set variable automaticaly
       this.productToBeUpdated.manage_stock = false; //set general manage_stock automaticaly
-      this.productToBeUpdated.status = "draft"; //set to draft until final save by user
+      if (this.isSavedAndClone) {
+        this.productToBeUpdated.status = "draft";
+      } //set to draft until final save by user
     }
 
     axios({
@@ -269,12 +219,12 @@ class productStore {
     this.loading = false;
     this.isProductChanged = false;
     this.selectedCategories = [];
-    this.dataToBeUpdated = [];
+    this.dataToBeUpdated = {};
     this.attributesToBeUpdated = {};
     this.attributesWarning = false;
     this.autoCreateVariations = false;
-    this.notValidFields = [];
-    this.notValidVariations = [];
+    this.notValidFields = [{}];
+    this.notValidVariations = [{}];
     if (!fromCancelButton) this.productsaved = true;
   }
 

@@ -3,10 +3,10 @@ import { getLocalStorageUtil } from "../common/utils/setGetLocalStorage";
 
 class preferencesStore {
   preferences = {
-    showWeight: true,
+    showWeight: false,
     showFeatured: true,
     showSlug: true,
-    autoGenSku: true,
+    autoGenSku: false,
   };
 
   constructor() {
@@ -19,6 +19,12 @@ class preferencesStore {
   getPreferences() {
     const preferences = getLocalStorageUtil("preferences");
     if (preferences) this.preferences = JSON.parse(preferences);
+  }
+  getPreferencesByVal(prop: string) {
+    debugger;
+    const property = prop;
+    const val = JSON.parse(getLocalStorageUtil("preferences"));
+    if (val) return val[property];
   }
 }
 

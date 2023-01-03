@@ -133,43 +133,8 @@ const ProductVariations = function ProductVariations({
                 </VariationLabel>
                 <VariationContainer>
                   <div>
-                    <span>Sku</span>
-                    <TextField
-                      defaultValue={
-                        ProductStore.productToBeUpdated.sku +
-                        "-" +
-                        variation.attributes[0]?.option
-                      }
-                      value={
-                        preferencesStore.preferences.autoGenSku
-                          ? ProductStore.productToBeUpdated.sku +
-                            "-" +
-                            variation.attributes[0]?.option
-                          : variation.sku
-                      } //variation.sku
-                      onChange={(e) =>
-                        handleInputChange(
-                          variation.id,
-                          "sku",
-                          e.target.value,
-                          index
-                        )
-                      }
-                      disabled={preferencesStore.preferences.autoGenSku}
-                      size="small"
-                      error={
-                        errors.find(
-                          (element: any) =>
-                            element.field === "sku" && element.index === index
-                        )
-                          ? true
-                          : false
-                      }
-                    />
-                  </div>
-                  <div>
                     <span>
-                      Regular Price{" "}
+                      Regular Price*{" "}
                       {index === 0 &&
                         productVariations.productVariations.length !== 1 && (
                           <div
@@ -194,7 +159,9 @@ const ProductVariations = function ProductVariations({
                     </span>
 
                     <TextField
-                      value={variation.regular_price}
+                      value={
+                        variation.regular_price ? variation.regular_price : ""
+                      }
                       onChange={(e) =>
                         handleInputChange(
                           variation.id,
@@ -250,7 +217,7 @@ const ProductVariations = function ProductVariations({
                         )}
                     </span>
                     <TextField
-                      value={variation.sale_price}
+                      value={variation.sale_price ? variation.sale_price : ""}
                       onChange={(e) =>
                         handleInputChange(
                           variation.id,
@@ -296,7 +263,9 @@ const ProductVariations = function ProductVariations({
                         )}
                     </span>
                     <TextField
-                      value={variation.stock_quantity}
+                      value={
+                        variation.stock_quantity ? variation.stock_quantity : ""
+                      }
                       onChange={(e) =>
                         handleInputChange(
                           variation.id,
@@ -311,45 +280,86 @@ const ProductVariations = function ProductVariations({
                       type="number"
                     />
                   </div>
-                  <div>
-                    <span>
-                      Weight
-                      {index === 0 &&
-                        productVariations.productVariations.length !== 1 && (
-                          <div
-                            style={{
-                              display: "flex",
-                              position: "absolute",
-                              right: "0",
-                            }}
-                          >
-                            <ContentPasteGoIcon
-                              sx={{
-                                width: "18px",
-                                fill: "#1976d2",
-                                cursor: "pointer",
+                  {preferencesStore.getPreferencesByVal("showWeight") && (
+                    <div>
+                      <span>
+                        Weight
+                        {index === 0 &&
+                          productVariations.productVariations.length !== 1 && (
+                            <div
+                              style={{
+                                display: "flex",
+                                position: "absolute",
+                                right: "0",
                               }}
-                              onClick={() =>
-                                productVariations.copyValues("weight")
-                              }
-                            />
-                          </div>
-                        )}
-                    </span>
+                            >
+                              <ContentPasteGoIcon
+                                sx={{
+                                  width: "18px",
+                                  fill: "#1976d2",
+                                  cursor: "pointer",
+                                }}
+                                onClick={() =>
+                                  productVariations.copyValues("weight")
+                                }
+                              />
+                            </div>
+                          )}
+                      </span>
+                      <TextField
+                        value={variation.weight ? variation.weight : ""}
+                        onChange={(e) =>
+                          handleInputChange(
+                            variation.id,
+                            "weight",
+                            parseInt(e.target.value)
+                          )
+                        }
+                        size="small"
+                        InputProps={{
+                          inputProps: { min: 0 },
+                        }}
+                        type="number"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <span>Sku (Optional)</span>
                     <TextField
-                      value={variation.weight}
+                      // defaultValue={
+                      //   ProductStore.productToBeUpdated.sku +
+                      //   "-" +
+                      //   variation.attributes[0]?.option
+                      // }
+                      value={
+                        preferencesStore.getPreferencesByVal("autoGenSku")
+                          ? ProductStore.productToBeUpdated.sku +
+                            "-" +
+                            variation.attributes[0]?.option
+                          : "" //variation.sku
+                        // ? variation.sku
+                        // : ""
+                      }
                       onChange={(e) =>
                         handleInputChange(
                           variation.id,
-                          "weight",
-                          parseInt(e.target.value)
+                          "sku",
+                          e.target.value,
+                          index
                         )
                       }
+                      disabled={preferencesStore.getPreferencesByVal(
+                        "autoGenSku"
+                      )}
                       size="small"
-                      InputProps={{
-                        inputProps: { min: 0 },
-                      }}
-                      type="number"
+                      error={
+                        errors.find(
+                          (element: any) =>
+                            element.field === "sku" && element.index === index
+                        )
+                          ? true
+                          : false
+                      }
                     />
                   </div>
                 </VariationContainer>

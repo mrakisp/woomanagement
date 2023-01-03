@@ -5,10 +5,10 @@ import { setLocalStorageUtil } from "../common/utils/setGetLocalStorage";
 
 interface Attributes {
   id: number;
-  name: string;
-  position?: number;
-  visible?: boolean;
-  variation: boolean;
+  name: string | undefined;
+  position?: number | undefined;
+  visible?: boolean | undefined;
+  variation: boolean | undefined;
   options: any[];
   slug?: string;
 }

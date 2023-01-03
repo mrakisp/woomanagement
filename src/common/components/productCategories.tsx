@@ -109,9 +109,13 @@ const ProductCategories = function ProductCategories({
             >
               <Checkbox
                 key={category.id}
-                checked={currentCategories?.some(
-                  (element: any) => element.id === category.id
-                )}
+                checked={
+                  currentCategories?.some(
+                    (element: any) => element.id === category.id
+                  )
+                    ? true
+                    : false
+                }
                 onClick={(e) =>
                   handleCategories(e, {
                     id: category.id,
@@ -134,9 +138,13 @@ const ProductCategories = function ProductCategories({
                 >
                   <Checkbox
                     key={category.id}
-                    checked={currentCategories?.some(
-                      (element: any) => element.id === category.id
-                    )}
+                    checked={
+                      currentCategories?.some(
+                        (element: any) => element.id === category.id
+                      )
+                        ? true
+                        : false
+                    }
                     onClick={(e) =>
                       handleCategories(e, {
                         id: category.id,
@@ -158,9 +166,13 @@ const ProductCategories = function ProductCategories({
                   >
                     <Checkbox
                       key={category.id}
-                      checked={currentCategories?.some(
-                        (element: any) => element.id === category.id
-                      )}
+                      checked={
+                        currentCategories?.some(
+                          (element: any) => element.id === category.id
+                        )
+                          ? true
+                          : false
+                      }
                       onClick={(e) =>
                         handleCategories(e, {
                           id: category.id,
