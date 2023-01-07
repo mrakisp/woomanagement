@@ -319,7 +319,7 @@ const ProductVariations = function ProductVariations({
                           ? ProductStore.productToBeUpdated.sku +
                             "-" +
                             variation.attributes[0]?.option
-                          : variation.sku
+                          : null //variation.sku
                         // ? variation.sku
                         // : ""
                       }

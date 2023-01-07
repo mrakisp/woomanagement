@@ -35,9 +35,15 @@ import Alert from "@mui/material/Alert";
 
 interface ProductProps {
   viewState: string;
+  productToBeEdited?: string;
+  setProductToBeEdited?: any;
 }
 
-const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
+const UpdateProduct = function UpdateProduct({
+  viewState,
+  productToBeEdited,
+  setProductToBeEdited,
+}: ProductProps) {
   const [isSearchBySku, setIsSearchBySku] = useState(true);
   const [isSkuFilled, setIsSkuFilled] = useState(false);
   const [isValidFields, setIsValidFields] = useState(false);
@@ -47,6 +53,13 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
   const [editorStateShortDescr, setEditorStateShortDescr] = useState(() =>
     EditorState.createEmpty()
   );
+
+  useEffect(() => {
+    if (productToBeEdited && viewState === "update") {
+      productStore.getProduct(productToBeEdited);
+      setProductToBeEdited("");
+    }
+  }, [productToBeEdited, setProductToBeEdited, viewState]);
 
   useEffect(() => {
     if (viewState === "create") {
@@ -59,6 +72,7 @@ const UpdateProduct = function UpdateProduct({ viewState }: ProductProps) {
   const productHasId = productStore.productToBeUpdated.id
     ? productStore.productToBeUpdated.id
     : "";
+
   useEffect(() => {
     if (viewState === "update" && productStore.productToBeUpdated.id) {
       const descr = convertFromHTML(

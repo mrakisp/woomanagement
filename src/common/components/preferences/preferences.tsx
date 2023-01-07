@@ -50,7 +50,7 @@ export default function Preferences({ visible }: PreferencesProps) {
       })
     )
   );
-
+  // const visible =
   const handleChange = (switchVal: any) => {
     const updatedPreferences = JSON.parse(JSON.stringify(preferences));
     updatedPreferences[switchVal.target.value] = switchVal.target.checked
@@ -93,20 +93,16 @@ export default function Preferences({ visible }: PreferencesProps) {
 
   return (
     <>
-      {visible && (
-        <>
-          <Settings>
-            <SettingsIcon onClick={handleOpen} />
-            <span>Show/Hide Fields</span>
-          </Settings>
+      <Settings>
+        <SettingsIcon onClick={handleOpen} />
+        <span>Show/Hide Fields</span>
+      </Settings>
 
-          <BasicModal
-            component={<Preferences />}
-            open={open}
-            handleClose={handleClose}
-          />
-        </>
-      )}
+      <BasicModal
+        component={<Preferences />}
+        open={open}
+        handleClose={handleClose}
+      />
     </>
   );
 }
