@@ -15,7 +15,7 @@ Create an `.env` file in root directory providing the below values: \
 `REACT_APP_CONSUMER_KEY = "ck_consumerKey"` \
 `REACT_APP_CONSUMER_SECRET = "cs_consumerSecret"` \
 `REACT_APP_USERNAME = "login_username"` \
-`REACT_APP_PASSWORD = "login_password"` \
+`REACT_APP_PASSWORD = "login_password"`
 
 ## Run the project
 
@@ -26,5 +26,5 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 ## Restrictions
 
-For variable products, you can use only one attribute to be used as variations./
+For variable products, you can use only one attribute to be used as variations.\
 For example if you have "size: S, M, L" and "color: Blue, Red, Black" as attributes you can create variations based on color's OR based on size's only.
