@@ -1,3 +1,10 @@
+# About project
+
+Easy and fast woocommerce management stand alone application.\
+If you have a slow woocommerce store or you need even faster management of your store, you just found a solution.\
+Create/Update and manage your woocommerce store easy without delay's and overheads from your theme or plugins.\
+Working with simple & variable products.
+
 # Getting Started
 
 From your Woocommerce site generate REST API keys with Read/Write permissions.\
