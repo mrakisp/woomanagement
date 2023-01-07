@@ -15,7 +15,7 @@ import { isEmpty } from "lodash";
 import {
   searchProductsType,
   searchBySku,
-  searchBySearch,
+  // searchBySearch,
 } from "../common/components/search/searchTypes";
 import Button from "../common/components/button";
 import BasicModal from "../common/components/modal";
@@ -44,7 +44,7 @@ const UpdateProduct = function UpdateProduct({
   productToBeEdited,
   setProductToBeEdited,
 }: ProductProps) {
-  const [isSearchBySku, setIsSearchBySku] = useState(true);
+  // const [isSearchBySku, setIsSearchBySku] = useState(true);
   const [isSkuFilled, setIsSkuFilled] = useState(false);
   const [isValidFields, setIsValidFields] = useState(false);
   const [editorStateDescr, setEditorStateDescr] = useState(() =>
@@ -319,22 +319,10 @@ const UpdateProduct = function UpdateProduct({
             columns={{ xs: 4, sm: 8, md: 12 }}
           >
             <Grid item xs={6} md={4}>
-              {isSearchBySku ? (
-                <SearchInput
-                  searchType={searchProductsType}
-                  searchBy={searchBySku}
-                />
-              ) : (
-                <SearchInput
-                  searchType={searchProductsType}
-                  searchBy={searchBySearch}
-                />
-              )}
-            </Grid>
-            <Grid item xs={3}>
-              Change Search By {isSearchBySku ? "Name" : "Sku"}
-              <br />
-              <Switch onChange={(e) => setIsSearchBySku(!isSearchBySku)} />
+              <SearchInput
+                searchType={searchProductsType}
+                searchBy={searchBySku}
+              />
             </Grid>
           </Grid>
         </Grid>

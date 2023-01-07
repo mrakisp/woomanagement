@@ -13,6 +13,7 @@ class productListStore {
   variationChanged = false;
   initialProductVariations: any[] = [];
   loadingSave = false;
+  hasSearchedValues = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -66,6 +67,44 @@ class productListStore {
           this.loading = false;
           return Promise.reject(error);
         });
+    });
+  }
+
+  async searchProducts(value: string) {
+    this.loading = true;
+    let params: any = {};
+    params["sku"] = value;
+
+    axios({
+      method: "get",
+      url: productsEndPoint + "?" + token,
+      params: params,
+    }).then((response) => {
+      if (response && response.data && response.data.length > 0) {
+        this.hasSearchedValues = true;
+        this.setProducts(response.data);
+      } else {
+        this.searchProductsByName(value);
+      }
+    });
+  }
+
+  async searchProductsByName(value: string) {
+    this.loading = true;
+    let params: any = {};
+    params["search"] = value;
+
+    axios({
+      method: "get",
+      url: productsEndPoint + "?" + token,
+      params: params,
+    }).then((response) => {
+      if (response && response.data && response.data.length > 0) {
+        this.hasSearchedValues = true;
+        this.setProducts(response.data);
+      } else {
+        alert("No Searched Results");
+      }
     });
   }
 

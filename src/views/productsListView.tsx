@@ -67,6 +67,7 @@ const ProductsTable = function CollapsibleTable({ handleEdit }: any) {
   const [orderBy, setOrderBy] = useState<keyof Data>("name");
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [selected, setSelected] = useState<any[]>([]);
+  const [isSearchResults, setIsSearchResults] = useState<boolean>(false);
 
   useEffect(() => {
     productListStore.getAllProductsCount();
@@ -131,7 +132,16 @@ const ProductsTable = function CollapsibleTable({ handleEdit }: any) {
 
   const handleDeleteItems = () => {
     productListStore.deleteProducts(selected);
-    // console.log(selected);
+  };
+
+  const handleSearch = (value: string) => {
+    setIsSearchResults(true);
+    productListStore.searchProducts(value);
+  };
+
+  const handleSearchCancel = () => {
+    setIsSearchResults(false);
+    productListStore.getProducts(1, 30);
   };
 
   return (
@@ -141,6 +151,9 @@ const ProductsTable = function CollapsibleTable({ handleEdit }: any) {
           <HeadToolbar
             numSelected={selected.length}
             deleteSelectedItems={handleDeleteItems}
+            handleSearch={handleSearch}
+            handleSearchCancel={handleSearchCancel}
+            isSearchResults={isSearchResults}
           />
 
           <TableContainer component={Paper}>
@@ -152,6 +165,9 @@ const ProductsTable = function CollapsibleTable({ handleEdit }: any) {
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={productListStore.allProducts.length}
+                // handleSearch={handleSearch}
+                // handleSearchCancel={handleSearchCancel}
+                // isSearchResults={isSearchResults}
               />
               <TableBody>
                 {stableSort(

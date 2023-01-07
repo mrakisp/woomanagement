@@ -15,6 +15,7 @@ import { amountSymbol } from "../../config/config";
 import productListStore from "../../store/productListStore";
 import InfoIcon from "@mui/icons-material/Info";
 import Tooltip from "@mui/material/Tooltip";
+import moment from "moment";
 
 interface ProductsProps {
   id: string;
@@ -50,7 +51,6 @@ const Row = function Row(props: {
         setOpen(!open);
       } else {
         productListStore.getProductVariations(id).then((variations) => {
-          console.log(variations);
           setVariations(variations);
           setOpen(!open);
         });
@@ -82,6 +82,7 @@ const Row = function Row(props: {
           <TableRow>
             <TableCell>Attribute</TableCell>
             <TableCell>Values</TableCell>
+            {/* <TableCell>Is Visible</TableCell> */}
           </TableRow>
         </TableHead>
 
@@ -89,13 +90,14 @@ const Row = function Row(props: {
           {attributes.map((attribute: any) => (
             <TableRow key={attribute.id}>
               <TableCell padding="checkbox">{attribute.name}</TableCell>
-              <TableCell component="th" scope="row">
+              <TableCell>
                 {attribute.options.map((option: any, index: number) =>
                   index !== attribute.options.length - 1
                     ? option + ", "
                     : option
                 )}
               </TableCell>
+              {/* <TableCell>{attribute.visible ? "Yes" : "No"}</TableCell> */}
             </TableRow>
           ))}
         </TableBody>
@@ -207,7 +209,9 @@ const Row = function Row(props: {
           )}
         </TableCell>
         <TableCell sx={{ maxWidth: "100px" }}>{categories}</TableCell>
-        <TableCell>{row.date_created}</TableCell>
+        <TableCell>
+          {moment(row.date_created).format("DD/MM/YYYY, h:mm:ss a")}
+        </TableCell>
         <TableCell>
           <span
             style={{
@@ -248,19 +252,24 @@ const Row = function Row(props: {
           <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <Box sx={{ margin: 1 }}>
-                <div style={{ display: "flex", paddingBottom: "25px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    paddingBottom: "25px",
+                  }}
+                >
+                  {row.type === "variable" &&
+                    variations &&
+                    variations.length > 0 && (
+                      <Table size="small" sx={{ marginRight: "200px" }}>
+                        <Variations variations={variations} />
+                      </Table>
+                    )}
                   {row.attributes && row.attributes.length > 0 && (
                     <Table size="small">
                       <Attributes attributes={row.attributes} />
                     </Table>
                   )}
-                  {row.type === "variable" &&
-                    variations &&
-                    variations.length > 0 && (
-                      <Table size="small">
-                        <Variations variations={variations} />
-                      </Table>
-                    )}
                 </div>
               </Box>
             </Collapse>

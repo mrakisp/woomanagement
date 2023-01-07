@@ -1,7 +1,6 @@
-import * as React from "react";
+import React from "react";
 import Box from "@mui/material/Box";
 import TableCell from "@mui/material/TableCell";
-
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
