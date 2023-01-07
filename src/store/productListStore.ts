@@ -69,12 +69,47 @@ class productListStore {
     });
   }
 
+  deleteProducts(products: any[]) {
+    this.loading = true;
+
+    const data = {
+      delete: products,
+    };
+    axios({
+      method: "post",
+      url: productsEndPoint + "batch/?" + token,
+      data,
+    }).then((response) => {
+      if (
+        response &&
+        response.data &&
+        response.data.delete &&
+        response.data.delete.length > 0
+      ) {
+        this.setProducts(
+          this.filterByReference(this.allProducts, response.data.delete)
+        );
+      }
+      this.loading = false;
+    });
+  }
+
   setProducts = (products: []) => {
     this.allProducts = products;
   };
 
   setTotalProductsCount = (totalProductsCount: number) => {
     this.allProductsCount = totalProductsCount;
+  };
+
+  filterByReference = (arr1: any, arr2: any) => {
+    let res = [];
+    res = arr1.filter((el: { id: number }) => {
+      return !arr2.find((element: { id: number }) => {
+        return element.id === el.id;
+      });
+    });
+    return res;
   };
 }
 

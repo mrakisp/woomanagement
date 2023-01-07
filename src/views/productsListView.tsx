@@ -66,7 +66,7 @@ const ProductsTable = function CollapsibleTable({ handleEdit }: any) {
   const [order, setOrder] = useState<Order>("asc");
   const [orderBy, setOrderBy] = useState<keyof Data>("name");
   const [rowsPerPage, setRowsPerPage] = useState(30);
-  const [selected, setSelected] = useState<readonly string[]>([]);
+  const [selected, setSelected] = useState<any[]>([]);
 
   useEffect(() => {
     productListStore.getAllProductsCount();
@@ -86,8 +86,6 @@ const ProductsTable = function CollapsibleTable({ handleEdit }: any) {
     setPage(0);
   };
 
-  const isSelected = (name: string) => selected.indexOf(name) !== -1;
-
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
     property: keyof Data
@@ -97,21 +95,26 @@ const ProductsTable = function CollapsibleTable({ handleEdit }: any) {
     setOrderBy(property);
   };
 
+  const isSelected = (id: number | string) => selected.indexOf(id) !== -1;
+
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = productListStore.allProducts.map((n: any) => n.name);
+      const newSelected = productListStore.allProducts.map((n: any) => n.id);
       setSelected(newSelected);
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected: readonly string[] = [];
+  const handleSelect = (
+    event: React.MouseEvent<unknown>,
+    id: number | string
+  ) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected: any[] = [];
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
+      newSelected = newSelected.concat(selected, id);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -126,11 +129,19 @@ const ProductsTable = function CollapsibleTable({ handleEdit }: any) {
     setSelected(newSelected);
   };
 
+  const handleDeleteItems = () => {
+    productListStore.deleteProducts(selected);
+    // console.log(selected);
+  };
+
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       {productListStore.allProducts ? (
         <>
-          <HeadToolbar numSelected={selected.length} />
+          <HeadToolbar
+            numSelected={selected.length}
+            deleteSelectedItems={handleDeleteItems}
+          />
 
           <TableContainer component={Paper}>
             <Table stickyHeader aria-label="collapsible table">
@@ -149,7 +160,7 @@ const ProductsTable = function CollapsibleTable({ handleEdit }: any) {
                 )
                   //.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row: any, index: number) => {
-                    const isItemSelected = isSelected(row.name);
+                    const isItemSelected = isSelected(row.id);
                     const labelId = `enhanced-table-checkbox-${index}`;
                     return (
                       <Row
@@ -157,7 +168,7 @@ const ProductsTable = function CollapsibleTable({ handleEdit }: any) {
                         row={row}
                         selected={isItemSelected}
                         labelId={labelId}
-                        handleClick={handleClick}
+                        handleSelect={handleSelect}
                         handleEdit={handleEdit}
                       />
                     );

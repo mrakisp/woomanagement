@@ -13,6 +13,8 @@ import TableBody from "@mui/material/TableBody";
 import EditIcon from "@mui/icons-material/Edit";
 import { amountSymbol } from "../../config/config";
 import productListStore from "../../store/productListStore";
+import InfoIcon from "@mui/icons-material/Info";
+import Tooltip from "@mui/material/Tooltip";
 
 interface ProductsProps {
   id: string;
@@ -35,10 +37,10 @@ const Row = function Row(props: {
   row: ProductsProps;
   selected: boolean;
   labelId: string;
-  handleClick: (event: React.MouseEvent<unknown>, name: string) => void;
+  handleSelect: (event: React.MouseEvent<unknown>, id: number | string) => void;
   handleEdit: any;
 }) {
-  const { row, selected, labelId, handleClick, handleEdit } = props;
+  const { row, selected, labelId, handleSelect, handleEdit } = props;
   const [open, setOpen] = useState(false);
   const [variations, setVariations] = useState([]);
 
@@ -66,12 +68,8 @@ const Row = function Row(props: {
 
   if (row.type === "variable") {
     const parsedPrices = row.price_html?.match(/([0-9]*,[0-9]+)/g);
-    row.regular_price = parsedPrices
-      ? parseFloat(parsedPrices[0].replace(",", "."))
-      : 0;
-    row.sale_price = parsedPrices
-      ? parseFloat(parsedPrices[1].replace(",", "."))
-      : 0;
+    row.regular_price = parsedPrices ? parseFloat(parsedPrices[0]) : 0;
+    row.sale_price = parsedPrices ? parseFloat(parsedPrices[1]) : 0;
   } else {
     row.regular_price = parseFloat(row.regular_price);
     row.sale_price = parseFloat(row.sale_price);
@@ -150,7 +148,7 @@ const Row = function Row(props: {
           <Checkbox
             color="primary"
             checked={selected}
-            onClick={(event) => handleClick(event, row.name)}
+            onClick={(event) => handleSelect(event, row.id)}
             inputProps={{
               "aria-labelledby": labelId,
             }}
@@ -168,9 +166,21 @@ const Row = function Row(props: {
           />
         </TableCell>
         <TableCell component="th" id={labelId} scope="row" padding="none">
-          {row.name}
+          {row.sku}
         </TableCell>
-        <TableCell>{row.sku}</TableCell>
+        <TableCell>
+          {row.name}
+          <span
+            style={{
+              display: "flex",
+              fontSize: "12px",
+              fontStyle: "italic",
+              color: "#9e9e9e",
+            }}
+          >
+            Id: {row.id}
+          </span>
+        </TableCell>
         <TableCell>
           {row.regular_price}
           {amountSymbol}
@@ -179,18 +189,36 @@ const Row = function Row(props: {
           {row.sale_price ? row.sale_price + amountSymbol : "-"}
         </TableCell>
         <TableCell
-          style={{ color: row.stock_status === "outofstock" ? "red" : "green" }}
+          style={{
+            color: row.stock_status === "outofstock" ? "red" : "green",
+            fontWeight: "600",
+          }}
         >
           {row.type === "simple"
             ? row.stock_status + " ( " + row.stock_quantity + " )"
             : row.stock_status}
+          {row.type === "variable" && (
+            <Tooltip title="Expand row to see more details">
+              <InfoIcon
+                sx={{ cursor: "pointer", fontSize: "15px" }}
+                onClick={() => handleOpen(row.id)}
+              />
+            </Tooltip>
+          )}
         </TableCell>
         <TableCell sx={{ maxWidth: "100px" }}>{categories}</TableCell>
         <TableCell>{row.date_created}</TableCell>
-        <TableCell
-          style={{ color: row.status === "publish" ? "green" : "red" }}
-        >
-          {row.status}
+        <TableCell>
+          <span
+            style={{
+              padding: "10px",
+              color: "#fff",
+              backgroundColor: row.status === "publish" ? "green" : "#b14d4d",
+              borderRadius: "5px",
+            }}
+          >
+            {row.status}
+          </span>
         </TableCell>
         {row.attributes && row.attributes.length > 0 ? (
           <TableCell>
@@ -209,6 +237,7 @@ const Row = function Row(props: {
           <EditIcon
             sx={{ cursor: "pointer;" }}
             onClick={() => handleEdit(row.id)}
+            color="info"
           />
         </TableCell>
       </TableRow>

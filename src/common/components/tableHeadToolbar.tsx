@@ -9,12 +9,13 @@ import Tooltip from "@mui/material/Tooltip";
 
 interface EnhancedTableToolbarProps {
   numSelected: number;
+  deleteSelectedItems: () => void;
 }
 
 const HeadToolbar = function EnhancedTableToolbar(
   props: EnhancedTableToolbarProps
 ) {
-  const { numSelected } = props;
+  const { numSelected, deleteSelectedItems } = props;
 
   return (
     <Toolbar
@@ -51,7 +52,7 @@ const HeadToolbar = function EnhancedTableToolbar(
       )}
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton>
+          <IconButton onClick={deleteSelectedItems}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>

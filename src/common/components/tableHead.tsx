@@ -37,17 +37,18 @@ const headCells: readonly HeadCell[] = [
     label: "Image",
   },
   {
-    id: "name",
-    numeric: false,
-    disablePadding: true,
-    label: "Product Name",
-  },
-  {
     id: "sku",
     numeric: false,
-    disablePadding: false,
+    disablePadding: true,
     label: "Sku",
   },
+  {
+    id: "name",
+    numeric: false,
+    disablePadding: false,
+    label: "Product Name",
+  },
+
   {
     id: "regular_price",
     numeric: true,
