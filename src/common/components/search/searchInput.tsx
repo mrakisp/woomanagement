@@ -27,7 +27,7 @@ const SearchInput = function SearchInput({
 }: SearchProps) {
   const [fetchResults, setFetchResults] = useState<Product[]>([]);
   const fetchedResults = searchStore.products.length > 0 ? true : false;
-  const searchLabel = `Search by ${searchBy.name}`;
+  const searchLabel = `Search by Sku or Name`;
   const searchByKey = searchBy.key;
 
   const searchByInputValue = (value: string) => {
