@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from "react";
-import useLocalStorage from "../hooks/useLocalStorage";
-import categoriesStore from "../../store/categoriesStore";
+import useLocalStorage from "../../hooks/useLocalStorage";
+import categoriesStore from "../../../store/categoriesStore";
 import { observer } from "mobx-react-lite";
 import Checkbox from "@mui/material/Checkbox";
-import Button from "./button";
+import Button from "../button";
 import TextField from "@mui/material/TextField";
 import Alert from "@mui/material/Alert";
 
 import CachedIcon from "@mui/icons-material/Cached";
-import {
-  ListItemStyled,
-  UlMaxHeightStyled,
-} from "../../common/components/styledComponents";
+import { ListItemStyled, UlMaxHeightStyled } from "../styledComponents";
 
 interface ProductCategoriesProps {
   handleCategories: (isChecked: any, data: {}) => void; //any;

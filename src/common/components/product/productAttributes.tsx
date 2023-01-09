@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import useLocalStorage from "../hooks/useLocalStorage";
-import attributesStore from "../../store/attributesStore";
-import productTempSavedValuesStore from "../../store/productTempSavedValuesStore";
+import useLocalStorage from "../../hooks/useLocalStorage";
+import attributesStore from "../../../store/attributesStore";
+import productTempSavedValuesStore from "../../../store/productTempSavedValuesStore";
 import { observer } from "mobx-react-lite";
 import Checkbox from "@mui/material/Checkbox";
 import TextField from "@mui/material/TextField";
@@ -11,7 +11,7 @@ import ContentPasteGoIcon from "@mui/icons-material/ContentPasteGo";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import Tooltip from "@mui/material/Tooltip";
 import Alert from "@mui/material/Alert";
-import Button from "./button";
+import Button from "../button";
 import styled from "styled-components";
 
 //Styled internal components

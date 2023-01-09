@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import productStore from "../store/productStore";
 import preferencesStore from "../store/preferencesStore";
-import ProductCategories from "../common/components/productCategories";
-import ProductAttributes from "../common/components/productAttributes";
-import ProductVariations from "../common/components/productVariations";
+import ProductCategories from "../common/components/product/productCategories";
+import ProductAttributes from "../common/components/product/productAttributes";
+import ProductVariations from "../common/components/product/productVariations";
 import Loading from "../common/components/loading";
 import SearchInput from "../common/components/search/searchInput";
 import { EditorState, ContentState, convertFromHTML } from "draft-js";

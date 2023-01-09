@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
-import productVariations from "../../store/variationsStore";
+import productVariations from "../../../store/variationsStore";
 import { observer } from "mobx-react-lite";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import ContentPasteGoIcon from "@mui/icons-material/ContentPasteGo";
 import styled from "styled-components";
-import { amountSymbol } from "../../config/config";
-import Loading from "./loading";
-import ProductStore from "../../store/productStore";
-import preferencesStore from "../../store/preferencesStore";
+import { amountSymbol } from "../../../config/config";
+import Loading from "../loading";
+import ProductStore from "../../../store/productStore";
+import preferencesStore from "../../../store/preferencesStore";
 
 interface ProductVariationsProps {
   selectedAttributes: [];

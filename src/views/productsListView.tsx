@@ -6,9 +6,9 @@ import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import TablePagination from "@mui/material/TablePagination";
-import Row from "../common/components/tableRow";
-import Head from "../common/components/tableHead";
-import HeadToolbar from "../common/components/tableHeadToolbar";
+import Row from "../common/components/table/tableRow";
+import Head from "../common/components/table/tableHead";
+import HeadToolbar from "../common/components/table/tableHeadToolbar";
 
 interface Data {
   images: any;
